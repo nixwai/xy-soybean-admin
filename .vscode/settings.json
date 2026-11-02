@@ -19,5 +19,8 @@
     "baseUrl": "."
   },
   "oxc.fmt.configPath": "./vite.config.ts",
-  "unocss.root": ["./"]
+  "unocss.root": ["./"],
+  "[vue]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  }
 }
