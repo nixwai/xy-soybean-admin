@@ -40,6 +40,24 @@ export const generatedRoutes: GeneratedRoute[] = [
     }
   },
   {
+    name: 'admin',
+    path: '/admin',
+    component: 'layout.base$view.admin',
+    meta: {
+      title: 'admin',
+      i18nKey: 'route.admin'
+    }
+  },
+  {
+    name: 'audit',
+    path: '/audit',
+    component: 'layout.base$view.audit',
+    meta: {
+      title: 'audit',
+      i18nKey: 'route.audit'
+    }
+  },
+  {
     name: 'home',
     path: '/home',
     component: 'layout.base$view.home',
@@ -73,6 +91,33 @@ export const generatedRoutes: GeneratedRoute[] = [
       i18nKey: 'route.login',
       constant: true,
       hideInMenu: true
+    }
+  },
+  {
+    name: 'menu',
+    path: '/menu',
+    component: 'layout.base$view.menu',
+    meta: {
+      title: 'menu',
+      i18nKey: 'route.menu'
+    }
+  },
+  {
+    name: 'permission',
+    path: '/permission',
+    component: 'layout.base$view.permission',
+    meta: {
+      title: 'permission',
+      i18nKey: 'route.permission'
+    }
+  },
+  {
+    name: 'role',
+    path: '/role',
+    component: 'layout.base$view.role',
+    meta: {
+      title: 'role',
+      i18nKey: 'route.role'
     }
   }
 ];

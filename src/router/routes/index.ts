@@ -16,11 +16,21 @@ export function createStaticRoutes() {
 
   const authRoutes: ElegantRoute[] = [];
 
+  const permissionMap: Record<string, string> = {
+    admin: 'admin:GET',
+    audit: 'audit:GET',
+    menu: 'menu:GET',
+    permission: 'permission:GET',
+    role: 'role:GET'
+  };
+
   [...customRoutes, ...generatedRoutes].forEach(item => {
-    if (item.meta?.constant) {
-      constantRoutes.push(item);
+    const permission = permissionMap[item.name];
+    const route = (permission ? { ...item, meta: { ...item.meta, permission } } : item) as ElegantRoute;
+    if (route.meta?.constant) {
+      constantRoutes.push(route);
     } else {
-      authRoutes.push(item);
+      authRoutes.push(route);
     }
   });
 

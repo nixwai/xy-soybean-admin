@@ -20,5 +20,10 @@ export const views: Record<LastLevelRouteKey, RouteComponent | (() => Promise<Ro
   500: () => import("@/views/_builtin/500/index.vue"),
   "iframe-page": () => import("@/views/_builtin/iframe-page/[url].vue"),
   login: () => import("@/views/_builtin/login/index.vue"),
+  admin: () => import("@/views/admin/index.vue"),
+  audit: () => import("@/views/audit/index.vue"),
   home: () => import("@/views/home/index.vue"),
+  menu: () => import("@/views/menu/index.vue"),
+  permission: () => import("@/views/permission/index.vue"),
+  role: () => import("@/views/role/index.vue"),
 };

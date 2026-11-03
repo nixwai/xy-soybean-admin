@@ -12,7 +12,7 @@ import { ROOT_ROUTE } from '@/router/routes/builtin';
 import { useAuthStore } from '../auth';
 import { useTabStore } from '../tab';
 import {
-  filterAuthRoutesByRoles,
+  filterAuthRoutesByPermissions,
   filterRoutesByDev,
   getBreadcrumbsByRoute,
   getCacheRouteNames,
@@ -198,7 +198,7 @@ export const useRouteStore = defineStore(SetupStoreId.Route, () => {
     if (authStore.isStaticSuper) {
       addAuthRoutes(staticAuthRoutes);
     } else {
-      const filteredAuthRoutes = filterAuthRoutesByRoles(staticAuthRoutes, authStore.userInfo.roles);
+      const filteredAuthRoutes = filterAuthRoutesByPermissions(staticAuthRoutes, authStore.userInfo.permissions);
 
       addAuthRoutes(filteredAuthRoutes);
     }

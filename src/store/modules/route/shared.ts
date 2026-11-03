@@ -43,6 +43,19 @@ function filterAuthRouteByRoles(route: ElegantConstRoute, roles: string[]): Eleg
   return hasPermission || isEmptyRoles ? [filterRoute] : [];
 }
 
+/** 根据后端权限编码过滤静态管理路由。 */
+export function filterAuthRoutesByPermissions(routes: ElegantConstRoute[], permissions: string[]) {
+  return routes.flatMap(route => filterAuthRouteByPermissions(route, permissions));
+}
+
+function filterAuthRouteByPermissions(route: ElegantConstRoute, permissions: string[]): ElegantConstRoute[] {
+  const permission = route.meta?.permission;
+  if (permission && !permissions.includes(permission)) return [];
+  const children = route.children?.flatMap(item => filterAuthRouteByPermissions(item, permissions));
+  if (route.children?.length && !children?.length) return [];
+  return [{ ...route, ...(route.children ? { children } : {}) }];
+}
+
 /**
  * Filter routes by `isDev` of meta
  *

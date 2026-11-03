@@ -22,6 +22,8 @@ declare module 'vue-router' {
      * It only works when the route mode is "static", if the route mode is "dynamic", it will be ignored
      */
     roles?: string[];
+    /** Route permission required to enter the page */
+    permission?: string;
     /** Whether to cache the route */
     keepAlive?: boolean | null;
     /**
