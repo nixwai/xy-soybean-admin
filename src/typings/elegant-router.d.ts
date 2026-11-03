@@ -20,14 +20,15 @@ declare module "@elegant-router/types" {
     "403": "/403";
     "404": "/404";
     "500": "/500";
-    "admin": "/admin";
-    "audit": "/audit";
     "home": "/home";
     "iframe-page": "/iframe-page/:url";
     "login": "/login/:module(pwd-login|code-login|register|reset-pwd|bind-wechat)?";
-    "menu": "/menu";
-    "permission": "/permission";
-    "role": "/role";
+    "system-management": "/system-management";
+    "system-management_admin": "/system-management/admin";
+    "system-management_audit": "/system-management/audit";
+    "system-management_menu": "/system-management/menu";
+    "system-management_permission": "/system-management/permission";
+    "system-management_role": "/system-management/role";
   };
 
   /**
@@ -62,14 +63,10 @@ declare module "@elegant-router/types" {
     | "403"
     | "404"
     | "500"
-    | "admin"
-    | "audit"
     | "home"
     | "iframe-page"
     | "login"
-    | "menu"
-    | "permission"
-    | "role"
+    | "system-management"
   >;
 
   /**
@@ -91,12 +88,12 @@ declare module "@elegant-router/types" {
     | "500"
     | "iframe-page"
     | "login"
-    | "admin"
-    | "audit"
     | "home"
-    | "menu"
-    | "permission"
-    | "role"
+    | "system-management_admin"
+    | "system-management_audit"
+    | "system-management_menu"
+    | "system-management_permission"
+    | "system-management_role"
   >;
 
   /**

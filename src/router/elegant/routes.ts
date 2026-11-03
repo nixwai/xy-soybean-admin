@@ -40,24 +40,6 @@ export const generatedRoutes: GeneratedRoute[] = [
     }
   },
   {
-    name: 'admin',
-    path: '/admin',
-    component: 'layout.base$view.admin',
-    meta: {
-      title: 'admin',
-      i18nKey: 'route.admin'
-    }
-  },
-  {
-    name: 'audit',
-    path: '/audit',
-    component: 'layout.base$view.audit',
-    meta: {
-      title: 'audit',
-      i18nKey: 'route.audit'
-    }
-  },
-  {
     name: 'home',
     path: '/home',
     component: 'layout.base$view.home',
@@ -94,30 +76,66 @@ export const generatedRoutes: GeneratedRoute[] = [
     }
   },
   {
-    name: 'menu',
-    path: '/menu',
-    component: 'layout.base$view.menu',
+    name: 'system-management',
+    path: '/system-management',
+    component: 'layout.base',
     meta: {
-      title: 'menu',
-      i18nKey: 'route.menu'
-    }
-  },
-  {
-    name: 'permission',
-    path: '/permission',
-    component: 'layout.base$view.permission',
-    meta: {
-      title: 'permission',
-      i18nKey: 'route.permission'
-    }
-  },
-  {
-    name: 'role',
-    path: '/role',
-    component: 'layout.base$view.role',
-    meta: {
-      title: 'role',
-      i18nKey: 'route.role'
-    }
+      title: 'system-management',
+      i18nKey: 'route.system-management',
+      icon: 'carbon:settings',
+      order: 2
+    },
+    children: [
+      {
+        name: 'system-management_admin',
+        path: '/system-management/admin',
+        component: 'view.system-management_admin',
+        meta: {
+          title: 'system-management_admin',
+          i18nKey: 'route.system-management_admin',
+          order: 1
+        }
+      },
+      {
+        name: 'system-management_audit',
+        path: '/system-management/audit',
+        component: 'view.system-management_audit',
+        meta: {
+          title: 'system-management_audit',
+          i18nKey: 'route.system-management_audit',
+          order: 5
+        }
+      },
+      {
+        name: 'system-management_menu',
+        path: '/system-management/menu',
+        component: 'view.system-management_menu',
+        meta: {
+          title: 'system-management_menu',
+          i18nKey: 'route.system-management_menu',
+          order: 4
+        }
+      },
+      {
+        name: 'system-management_permission',
+        path: '/system-management/permission',
+        component: 'view.system-management_permission',
+        meta: {
+          title: 'system-management_permission',
+          i18nKey: 'route.system-management_permission',
+          order: 3
+        }
+      },
+      {
+        name: 'system-management_role',
+        path: '/system-management/role',
+        component: 'view.system-management_role',
+        meta: {
+          title: 'system-management_role',
+          i18nKey: 'route.system-management_role',
+          order: 2
+        }
+      }
+    ]
   }
 ];

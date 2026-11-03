@@ -225,12 +225,13 @@ const local: App.I18n.Schema = {
     404: '页面不存在',
     500: '服务器错误',
     'iframe-page': '外链页面',
-    admin: '管理员管理',
-    audit: '审计日志',
-    menu: '菜单管理',
-    permission: '权限管理',
-    role: '角色管理',
-    home: '工作台'
+    home: '工作台',
+    'system-management': '系统管理',
+    'system-management_admin': '管理员管理',
+    'system-management_role': '角色管理',
+    'system-management_permission': '权限管理',
+    'system-management_menu': '菜单管理',
+    'system-management_audit': '审计日志'
   },
 
   page: {

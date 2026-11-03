@@ -229,12 +229,13 @@ const local: App.I18n.Schema = {
     404: 'Page Not Found',
     500: 'Server Error',
     'iframe-page': 'Iframe',
-    admin: 'Administrators',
-    audit: 'Audit Logs',
-    menu: 'Menus',
-    permission: 'Permissions',
-    role: 'Roles',
-    home: 'Dashboard'
+    home: 'Dashboard',
+    'system-management': 'System Management',
+    'system-management_admin': 'Administrators',
+    'system-management_role': 'Roles',
+    'system-management_permission': 'Permissions',
+    'system-management_menu': 'Menus',
+    'system-management_audit': 'Audit Logs'
   },
 
   page: {

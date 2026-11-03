@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createRoleForm } from '@/views/role/config/constants';
+import { createRoleForm } from '@/views/system-management/role/config/constants';
 
 describe('role form defaults', () => {
   it('creates an active role form with no permissions', () => {

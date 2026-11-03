@@ -17,16 +17,27 @@ export function createStaticRoutes() {
   const authRoutes: ElegantRoute[] = [];
 
   const permissionMap: Record<string, string> = {
-    admin: 'admin:GET',
-    audit: 'audit:GET',
-    menu: 'menu:GET',
-    permission: 'permission:GET',
-    role: 'role:GET'
+    'system-management_admin': 'admin:GET',
+    'system-management_role': 'role:GET',
+    'system-management_permission': 'permission:GET',
+    'system-management_menu': 'menu:GET',
+    'system-management_audit': 'audit:GET'
   };
 
+  function applyRoutePermission(route: ElegantRoute): ElegantRoute {
+    const permission = permissionMap[route.name];
+    const children =
+      'children' in route ? route.children?.map(child => applyRoutePermission(child as ElegantRoute)) : undefined;
+
+    return {
+      ...route,
+      ...(children ? { children } : {}),
+      ...(permission ? { meta: { ...route.meta, permission } } : {})
+    } as ElegantRoute;
+  }
+
   [...customRoutes, ...generatedRoutes].forEach(item => {
-    const permission = permissionMap[item.name];
-    const route = (permission ? { ...item, meta: { ...item.meta, permission } } : item) as ElegantRoute;
+    const route = applyRoutePermission(item as ElegantRoute);
     if (route.meta?.constant) {
       constantRoutes.push(route);
     } else {

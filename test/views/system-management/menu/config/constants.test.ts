@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createMenuForm, toMenuForm } from '@/views/menu/config/constants';
+import { createMenuForm, toMenuForm } from '@/views/system-management/menu/config/constants';
 
 describe('menu form conversion', () => {
   it('creates the next order as a string', () => {
