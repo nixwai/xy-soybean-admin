@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createHomeStatCards } from './home-statistics';
+import { createHomeStatCards } from '@/views/home/utils/home-statistics';
 
 describe('createHomeStatCards', () => {
   it('按固定顺序生成首页统计卡片', () => {

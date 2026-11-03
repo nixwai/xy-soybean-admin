@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createAdminForm, createAdminPasswordForm } from './constants';
+import { createAdminForm, createAdminPasswordForm } from '@/views/admin/config/constants';
 
 describe('admin form defaults', () => {
   it('creates independent empty forms', () => {

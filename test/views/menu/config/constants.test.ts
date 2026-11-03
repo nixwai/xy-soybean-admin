@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createMenuForm, toMenuForm } from './constants';
+import { createMenuForm, toMenuForm } from '@/views/menu/config/constants';
 
 describe('menu form conversion', () => {
   it('creates the next order as a string', () => {
@@ -19,6 +19,14 @@ describe('menu form conversion', () => {
         isActive: true,
         deletedAt: null
       })
-    ).toEqual({ parentId: '', title: '首页', path: '/home', icon: '', order: '1', permissionCode: '', isActive: true });
+    ).toEqual({
+      parentId: '',
+      title: '首页',
+      path: '/home',
+      icon: '',
+      order: '1',
+      permissionCode: '',
+      isActive: true
+    });
   });
 });
