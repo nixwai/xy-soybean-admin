@@ -1,44 +1,12 @@
-<script setup lang="tsx">
-import { computed, onMounted, ref } from 'vue';
-import { NButton, NCard, NDataTable, NTag } from 'naive-ui';
-import { fetchAuditList } from '@/service/api';
+<script setup lang="ts">
+import { computed, onMounted } from 'vue';
+import { NButton, NCard, NDataTable } from 'naive-ui';
+import { createAuditColumns } from './utils/audit-columns';
+import { useAuditQuery } from './hooks/use-audit-query';
 
-const loading = ref(false);
-const items = ref<ApiManagement.AuditLog[]>([]);
-const nextCursor = ref<string | undefined>();
-const hasMore = ref(false);
-const columns = computed(() => [
-  { title: '时间', key: 'createdAt' },
-  { title: '动作', key: 'action' },
-  { title: '资源', key: 'resourceType' },
-  { title: '目标 ID', key: 'targetId' },
-  {
-    title: '结果',
-    key: 'succeeded',
-    render: (row: ApiManagement.AuditLog) => (
-      <NTag type={row.succeeded ? 'success' : 'error'}>{row.succeeded ? '成功' : '失败'}</NTag>
-    )
-  },
-  {
-    title: '详情',
-    key: 'details',
-    render: (row: ApiManagement.AuditLog) => (row.details ? JSON.stringify(row.details) : '-')
-  }
-]);
+const { loading, items, hasMore, load } = useAuditQuery();
+const columns = computed(createAuditColumns);
 
-async function load(reset = false) {
-  loading.value = true;
-  const result = await fetchAuditList({
-    limit: 20,
-    ...(reset ? {} : nextCursor.value ? { cursor: nextCursor.value } : {})
-  });
-  if (!result.error && result.data) {
-    items.value = reset ? result.data.items : [...items.value, ...result.data.items];
-    nextCursor.value = result.data.nextCursor || undefined;
-    hasMore.value = result.data.hasMore;
-  }
-  loading.value = false;
-}
 onMounted(() => load(true));
 </script>
 
