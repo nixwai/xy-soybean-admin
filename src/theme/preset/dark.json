@@ -61,7 +61,7 @@
   },
   "watermark": {
     "visible": false,
-    "text": "SoybeanAdmin",
+    "text": "景区导游预约平台后台",
     "enableUserName": false,
     "enableTime": false,
     "timeFormat": "YYYY-MM-DD HH:mm"

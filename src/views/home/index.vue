@@ -1,15 +1,16 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
 import { fetchAdminList, fetchAuditList, fetchMenuList, fetchPermissionList, fetchRoleList } from '@/service/api';
+import { $t } from '@/locales';
 
 const loading = ref(true);
 const stats = ref({ admins: 0, roles: 0, permissions: 0, menus: 0, audits: 0 });
 const cards = computed(() => [
-  { label: '管理员', value: stats.value.admins, icon: 'carbon:user-admin' },
-  { label: '角色', value: stats.value.roles, icon: 'carbon:identification' },
-  { label: '权限', value: stats.value.permissions, icon: 'carbon:security' },
-  { label: '菜单', value: stats.value.menus, icon: 'carbon:menu' },
-  { label: '审计记录', value: stats.value.audits, icon: 'carbon:activity' }
+  { label: $t('page.home.adminCount'), value: stats.value.admins, icon: 'carbon:user-admin' },
+  { label: $t('page.home.roleCount'), value: stats.value.roles, icon: 'carbon:identification' },
+  { label: $t('page.home.permissionCount'), value: stats.value.permissions, icon: 'carbon:security' },
+  { label: $t('page.home.menuCount'), value: stats.value.menus, icon: 'carbon:menu' },
+  { label: $t('page.home.auditCount'), value: stats.value.audits, icon: 'carbon:activity' }
 ]);
 
 onMounted(async () => {
@@ -33,8 +34,8 @@ onMounted(async () => {
 
 <template>
   <div class="flex-col-stretch gap-16px">
-    <NCard title="景区导游预约平台后台" :bordered="false" class="card-wrapper">
-      <p class="m-0 text-16px text-secondary">统一管理管理员、角色、权限、菜单和审计日志。</p>
+    <NCard :title="$t('page.home.title')" :bordered="false" class="card-wrapper">
+      <p class="m-0 text-16px text-secondary">{{ $t('page.home.description') }}</p>
     </NCard>
     <NGrid :x-gap="16" :y-gap="16" cols="1 600:2 900:5" responsive="screen">
       <NGi v-for="card in cards" :key="card.label">
