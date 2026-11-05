@@ -7,15 +7,17 @@ interface MenuFormSubmitOptions {
   onSuccess: () => void | Promise<void>;
 }
 
-/** 菜单新增和编辑表单。 */
+/** 菜单新增和编辑表单，更新接口要求提交完整字段。 */
 export function useMenuFormSubmit(options: MenuFormSubmitOptions) {
   const showModal = ref(false);
+  const submitting = ref(false);
   const editing = ref<ApiManagement.Menu | null>(null);
   const form = ref<MenuFormModel>(createMenuForm());
 
-  function openCreate(order: number) {
+  /** 打开新增弹窗，可预填父级菜单和排序值。 */
+  function openCreate(order = 0, parentId: string | null = null) {
     editing.value = null;
-    form.value = createMenuForm(order);
+    form.value = createMenuForm(order, parentId);
     showModal.value = true;
   }
 
@@ -26,22 +28,34 @@ export function useMenuFormSubmit(options: MenuFormSubmitOptions) {
   }
 
   async function submit() {
-    if (!form.value.title || !form.value.path) return;
-    const data = {
-      parentId: form.value.parentId || null,
-      title: form.value.title,
-      path: form.value.path,
-      icon: form.value.icon || undefined,
-      order: Number(form.value.order),
-      permissionCode: form.value.permissionCode || null,
-      ...(editing.value ? { id: editing.value.id, isActive: form.value.isActive } : {})
-    };
-    const result = editing.value ? await updateMenu(data as ApiManagement.MenuUpdateRequest) : await createMenu(data);
-    if (!result.error) {
+    const target = editing.value;
+    if (submitting.value) return;
+
+    submitting.value = true;
+    try {
+      const payload: ApiManagement.MenuCreateRequest = {
+        parentId: form.value.parentId || null,
+        title: form.value.title.trim(),
+        path: form.value.path.trim(),
+        icon: form.value.icon.trim() || undefined,
+        order: form.value.order,
+        permissionCode: form.value.permissionCode || null,
+        isRootOnly: form.value.isRootOnly
+      };
+
+      const result = target
+        ? await updateMenu({ ...payload, id: target.id, isActive: form.value.isActive })
+        : await createMenu(payload);
+
+      if (result.error) return;
+
+      window.$message?.success(target ? '菜单已更新' : '菜单已创建');
       showModal.value = false;
       await options.onSuccess();
+    } finally {
+      submitting.value = false;
     }
   }
 
-  return { showModal, editing, form, openCreate, openEdit, submit };
+  return { showModal, submitting, editing, form, openCreate, openEdit, submit };
 }

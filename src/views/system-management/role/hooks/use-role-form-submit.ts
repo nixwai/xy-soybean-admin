@@ -1,15 +1,16 @@
 import { ref } from 'vue';
-import { bindRolePermission, createRole, unbindRolePermission, updateRole } from '@/service/api';
-import { createRoleForm } from '../config/constants';
+import { createRole, updateRole } from '@/service/api';
+import { createRoleForm, toRoleForm } from '../config/constants';
 import type { RoleFormModel } from '../typings';
 
 interface RoleFormSubmitOptions {
   onSuccess: () => void | Promise<void>;
 }
 
-/** 角色新增、编辑和权限绑定表单。 */
+/** 角色新增和编辑表单，角色编码创建后不可修改。 */
 export function useRoleFormSubmit(options: RoleFormSubmitOptions) {
   const showModal = ref(false);
+  const submitting = ref(false);
   const editing = ref<ApiManagement.Role | null>(null);
   const form = ref<RoleFormModel>(createRoleForm());
 
@@ -21,45 +22,38 @@ export function useRoleFormSubmit(options: RoleFormSubmitOptions) {
 
   function openEdit(row: ApiManagement.Role) {
     editing.value = row;
-    form.value = {
-      code: row.code,
-      name: row.name,
-      description: row.description || '',
-      isActive: row.isActive,
-      permissionIds: [...row.permissionIds]
-    };
+    form.value = toRoleForm(row);
     showModal.value = true;
   }
 
-  async function syncPermissions(roleId: string, previousPermissionIds: string[]) {
-    const next = new Set(form.value.permissionIds);
-    const old = new Set(previousPermissionIds);
-    await Promise.all(
-      [...next].filter(id => !old.has(id)).map(permissionId => bindRolePermission({ roleId, permissionId }))
-    );
-    await Promise.all(
-      [...old].filter(id => !next.has(id)).map(permissionId => unbindRolePermission({ roleId, permissionId }))
-    );
-  }
-
   async function submit() {
-    if (!form.value.name || (!editing.value && !form.value.code)) return;
-    const result = editing.value
-      ? await updateRole({
-          id: editing.value.id,
-          name: form.value.name,
-          description: form.value.description,
-          isActive: form.value.isActive
-        })
-      : await createRole({ code: form.value.code, name: form.value.name, description: form.value.description });
+    const target = editing.value;
+    if (submitting.value) return;
 
-    if (!result.error && result.data) {
-      await syncPermissions(result.data.id, editing.value?.permissionIds || []);
-      window.$message?.success(editing.value ? '角色已更新' : '角色已创建');
+    submitting.value = true;
+    try {
+      const result = target
+        ? await updateRole({
+            id: target.id,
+            name: form.value.name,
+            description: form.value.description.trim() || null,
+            isActive: form.value.isActive
+          })
+        : await createRole({
+            code: form.value.code,
+            name: form.value.name,
+            description: form.value.description.trim() || null
+          });
+
+      if (result.error) return;
+
+      window.$message?.success(target ? '角色已更新' : '角色已创建');
       showModal.value = false;
       await options.onSuccess();
+    } finally {
+      submitting.value = false;
     }
   }
 
-  return { showModal, editing, form, openCreate, openEdit, submit };
+  return { showModal, submitting, editing, form, openCreate, openEdit, submit };
 }

@@ -2,6 +2,7 @@ import type { CustomRoute, ElegantConstRoute, ElegantRoute } from '@elegant-rout
 import { layouts, views } from '../elegant/imports';
 import { generatedRoutes } from '../elegant/routes';
 import { transformElegantRoutesToVueRoutes } from '../elegant/transform';
+import { applyRouteAccess } from './access';
 
 /**
  * custom routes
@@ -16,28 +17,8 @@ export function createStaticRoutes() {
 
   const authRoutes: ElegantRoute[] = [];
 
-  const permissionMap: Record<string, string> = {
-    'system-management_admin': 'admin:GET',
-    'system-management_role': 'role:GET',
-    'system-management_permission': 'permission:GET',
-    'system-management_menu': 'menu:GET',
-    'system-management_audit': 'audit:GET'
-  };
-
-  function applyRoutePermission(route: ElegantRoute): ElegantRoute {
-    const permission = permissionMap[route.name];
-    const children =
-      'children' in route ? route.children?.map(child => applyRoutePermission(child as ElegantRoute)) : undefined;
-
-    return {
-      ...route,
-      ...(children ? { children } : {}),
-      ...(permission ? { meta: { ...route.meta, permission } } : {})
-    } as ElegantRoute;
-  }
-
   [...customRoutes, ...generatedRoutes].forEach(item => {
-    const route = applyRoutePermission(item as ElegantRoute);
+    const route = applyRouteAccess(item as ElegantRoute);
     if (route.meta?.constant) {
       constantRoutes.push(route);
     } else {

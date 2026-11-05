@@ -4,6 +4,7 @@ import { getServiceBaseURL } from '@/utils/service';
 import { $t } from '@/locales';
 import { useAuthStore } from '@/store/modules/auth';
 import { getAuthorization, handleExpiredRequest, showErrorMsg } from './shared';
+import { normalizeBooleanFields } from './normalize';
 import type { RequestInstanceState } from './type';
 
 const isHttpProxy = import.meta.env.DEV && import.meta.env.VITE_HTTP_PROXY === 'Y';
@@ -14,7 +15,7 @@ export const request = createFlatRequest(
   {
     defaultState: { errMsgStack: [], refreshTokenPromise: null } as RequestInstanceState,
     transform(response: AxiosResponse<App.Service.Response<any>>) {
-      return response.data.data;
+      return normalizeBooleanFields(response.data.data);
     },
     async onRequest(config) {
       Object.assign(config.headers, { Authorization: getAuthorization() });

@@ -8,11 +8,11 @@ import { router } from '@/router';
 import { SetupStoreId } from '@/enum';
 import { getRouteName, getRoutePath } from '@/router/elegant/transform';
 import { createStaticRoutes, getAuthVueRoutes } from '@/router/routes';
+import { filterAuthRoutesByPermissions } from '@/router/routes/access';
 import { ROOT_ROUTE } from '@/router/routes/builtin';
 import { useAuthStore } from '../auth';
 import { useTabStore } from '../tab';
 import {
-  filterAuthRoutesByPermissions,
   filterRoutesByDev,
   getBreadcrumbsByRoute,
   getCacheRouteNames,
@@ -195,10 +195,14 @@ export const useRouteStore = defineStore(SetupStoreId.Route, () => {
   function initStaticAuthRoute() {
     const { authRoutes: staticAuthRoutes } = createStaticRoutes();
 
-    if (authStore.isStaticSuper) {
+    if (authStore.isRootAdmin) {
       addAuthRoutes(staticAuthRoutes);
     } else {
-      const filteredAuthRoutes = filterAuthRoutesByPermissions(staticAuthRoutes, authStore.userInfo.permissions);
+      const filteredAuthRoutes = filterAuthRoutesByPermissions(
+        staticAuthRoutes,
+        authStore.userInfo.permissions,
+        authStore.isRootAdmin
+      );
 
       addAuthRoutes(filteredAuthRoutes);
     }

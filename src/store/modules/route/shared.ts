@@ -5,58 +5,6 @@ import { $t } from '@/locales';
 import { useSvgIcon } from '@/hooks/common/icon';
 
 /**
- * Filter auth routes by roles
- *
- * @param routes Auth routes
- * @param roles Roles
- */
-export function filterAuthRoutesByRoles(routes: ElegantConstRoute[], roles: string[]) {
-  return routes.flatMap(route => filterAuthRouteByRoles(route, roles));
-}
-
-/**
- * Filter auth route by roles
- *
- * @param route Auth route
- * @param roles Roles
- */
-function filterAuthRouteByRoles(route: ElegantConstRoute, roles: string[]): ElegantConstRoute[] {
-  const routeRoles = (route.meta && route.meta.roles) || [];
-
-  // if the route's "roles" is empty, then it is allowed to access
-  const isEmptyRoles = !routeRoles.length;
-
-  // if the user's role is included in the route's "roles", then it is allowed to access
-  const hasPermission = routeRoles.some(role => roles.includes(role));
-
-  const filterRoute = { ...route };
-
-  if (filterRoute.children?.length) {
-    filterRoute.children = filterRoute.children.flatMap(item => filterAuthRouteByRoles(item, roles));
-  }
-
-  // Exclude the route if it has no children after filtering
-  if (filterRoute.children?.length === 0) {
-    return [];
-  }
-
-  return hasPermission || isEmptyRoles ? [filterRoute] : [];
-}
-
-/** 根据后端权限编码过滤静态管理路由。 */
-export function filterAuthRoutesByPermissions(routes: ElegantConstRoute[], permissions: string[]) {
-  return routes.flatMap(route => filterAuthRouteByPermissions(route, permissions));
-}
-
-function filterAuthRouteByPermissions(route: ElegantConstRoute, permissions: string[]): ElegantConstRoute[] {
-  const permission = route.meta?.permission;
-  if (permission && !permissions.includes(permission)) return [];
-  const children = route.children?.flatMap(item => filterAuthRouteByPermissions(item, permissions));
-  if (route.children?.length && !children?.length) return [];
-  return [{ ...route, ...(route.children ? { children } : {}) }];
-}
-
-/**
  * Filter routes by `isDev` of meta
  *
  * The route with `meta.isDev` set to true is only loaded in the development environment

@@ -4,6 +4,7 @@ import { localStg } from '@/utils/storage';
 import { useAuthStore } from '@/store/modules/auth';
 import { useRouteStore } from '@/store/modules/route';
 import { getRouteName } from '@/router/elegant/transform';
+import { hasRouteAccess } from '@/router/routes/access';
 
 /**
  * create route guard
@@ -26,10 +27,8 @@ export function createRouteGuard(router: Router) {
 
     const isLogin = Boolean(localStg.get('token'));
     const needLogin = !to.meta.constant;
-    const routeRoles = to.meta.roles || [];
 
-    const hasRole = authStore.userInfo.roles.some(role => routeRoles.includes(role));
-    const hasAuth = authStore.isStaticSuper || !routeRoles.length || hasRole;
+    const hasAuth = hasRouteAccess(to.meta, authStore.isRootAdmin, authStore.userInfo.permissions);
 
     // if it is login route when logged in, then switch to the root page
     if (to.name === loginRoute && isLogin) {

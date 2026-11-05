@@ -25,10 +25,12 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
     roles: [],
     buttons: [],
     permissions: [],
-    menus: []
+    menus: [],
+    isRoot: false
   });
 
-  const isStaticSuper = computed(() => Boolean(userInfo.isSuperAdmin));
+  /** 是否为后端根管理员，根管理员拥有全部管理接口权限。 */
+  const isRootAdmin = computed(() => userInfo.isRoot);
   const isLogin = computed(() => Boolean(token.value));
 
   /** 清理本地认证状态并返回登录页。 */
@@ -56,7 +58,7 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
     return false;
   }
 
-  /** 提交管理员登录凭据。 */
+  /** 提交管理员登录凭据，密码已在调用方完成 RSA 加密。 */
   async function login(username: string, password: string, redirect = true) {
     startLoading();
     try {
@@ -82,17 +84,18 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
     }
   }
 
+  /** 拉取当前管理员身份、权限编码和可见菜单。 */
   async function getUserInfo() {
     const { data: info, error } = await fetchGetUserInfo();
     if (error || !info) return false;
     Object.assign(userInfo, {
       userId: info.id,
       userName: info.username,
-      roles: info.isSuperAdmin ? ['admin'] : info.roleIds,
+      roles: info.isRoot ? [import.meta.env.VITE_STATIC_SUPER_ROLE] : info.roleIds,
       buttons: info.permissions,
       permissions: info.permissions,
       menus: info.menus,
-      isSuperAdmin: Boolean(info.isSuperAdmin)
+      isRoot: info.isRoot
     });
     return true;
   }
@@ -107,7 +110,7 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
   return {
     token,
     userInfo,
-    isStaticSuper,
+    isRootAdmin,
     isLogin,
     loginLoading,
     resetStore,

@@ -2,16 +2,19 @@ import { fetchAdminPublicKey } from '@/service/api';
 
 let publicKeyPromise: Promise<CryptoKey> | null = null;
 
+/** 将 PEM 公钥转换为 WebCrypto 可识别的 DER 二进制。 */
 function pemToDer(pem: string) {
   const base64 = pem.replace(/-----BEGIN PUBLIC KEY-----|-----END PUBLIC KEY-----|\s/g, '');
   const binary = window.atob(base64);
   return Uint8Array.from(binary, character => character.charCodeAt(0)).buffer;
 }
 
+/** 获取并缓存后端下发的密码加密公钥。 */
 async function getPublicKey() {
   if (!publicKeyPromise) {
     publicKeyPromise = fetchAdminPublicKey().then(async ({ data, error }) => {
       if (error || !data?.publicKey) {
+        publicKeyPromise = null;
         throw new Error('获取密码加密公钥失败');
       }
 
