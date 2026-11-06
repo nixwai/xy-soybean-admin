@@ -145,39 +145,30 @@ declare namespace ApiManagement {
     total: number;
   }
 
-  /** 菜单记录。 */
+  /** 菜单记录，字段与 /menu/list 返回值保持一致。 */
   interface Menu {
     id: string;
-    parentId: string | null;
+    menuKey: string;
+    parentKey: string | null;
     title: string;
     path: string;
-    icon: string | null;
     order: number;
     permissionCode: string | null;
-    /** 是否仅根管理员可见。 */
     isRootOnly: boolean;
     isActive: boolean;
-    deletedAt: string | null;
+    permissionAvailable: boolean;
   }
 
-  /** 创建菜单请求。 */
-  interface MenuCreateRequest {
-    parentId?: string | null;
-    title: string;
-    path: string;
-    icon?: string;
-    order?: number;
-    permissionCode?: string | null;
-    isRootOnly?: boolean;
-  }
-
-  /** 更新菜单请求。 */
-  interface MenuUpdateRequest extends MenuCreateRequest {
+  /** 后端仅允许更新菜单展示标题、排序和启用状态。 */
+  interface MenuUpdateRequest {
     id: string;
+    title?: string;
+    order?: number;
     isActive?: boolean;
   }
 
   /** 审计记录。 */
+
   interface AuditLog {
     id: string;
     actorAdminId: string | null;

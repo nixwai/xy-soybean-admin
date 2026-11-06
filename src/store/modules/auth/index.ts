@@ -18,7 +18,9 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
   const tabStore = useTabStore();
   const { toLogin, redirectFromLogin } = useRouterPush(false);
   const { loading: loginLoading, startLoading, endLoading } = useLoading();
+
   const token = ref('');
+
   const userInfo: Api.Auth.UserInfo = reactive({
     userId: '',
     userName: '',
@@ -31,86 +33,160 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
 
   /** 是否为后端根管理员，根管理员拥有全部管理接口权限。 */
   const isRootAdmin = computed(() => userInfo.isRoot);
+
+  /** is super role in static route */
+  const isStaticSuper = computed(() => {
+    const { VITE_AUTH_ROUTE_MODE } = import.meta.env;
+
+    return VITE_AUTH_ROUTE_MODE === 'static' && userInfo.isRoot;
+  });
+
+  /** Is login */
   const isLogin = computed(() => Boolean(token.value));
 
-  /** 清理本地认证状态并返回登录页。 */
+  /** Reset auth store */
   async function resetStore() {
     const refreshToken = localStg.get('refreshToken');
     if (refreshToken) {
       await fetchLogout(refreshToken).catch(() => undefined);
     }
+
+    recordUserId();
+
     clearAuthStorage();
+
     authStore.$reset();
-    if (!route.meta.constant) await toLogin();
+
+    if (!route.meta.constant) {
+      await toLogin();
+    }
+
     tabStore.cacheTabs();
     routeStore.resetStore();
   }
 
-  /** 使用接口返回的访问令牌加载管理员授权信息。 */
-  async function loginByToken(loginToken: Api.Auth.LoginToken) {
-    localStg.set('token', loginToken.accessToken);
-    localStg.set('refreshToken', loginToken.refreshToken);
-    const pass = await getUserInfo();
-    if (pass) {
-      token.value = loginToken.accessToken;
+  /** Record the user ID of the previous login session Used to compare with the current user ID on next login */
+  function recordUserId() {
+    if (!userInfo.userId) {
+      return;
+    }
+
+    // Store current user ID locally for next login comparison
+    localStg.set('lastLoginUserId', userInfo.userId);
+  }
+
+  /**
+   * Check if current login user is different from previous login user If different, clear all tabs
+   *
+   * @returns {boolean} Whether to clear all tabs
+   */
+  function checkTabClear(): boolean {
+    if (!userInfo.userId) {
+      return false;
+    }
+
+    const lastLoginUserId = localStg.get('lastLoginUserId');
+
+    // Clear all tabs if current user is different from previous user
+    if (!lastLoginUserId || lastLoginUserId !== userInfo.userId) {
+      localStg.remove('globalTabs');
+      tabStore.clearTabs();
+
+      localStg.remove('lastLoginUserId');
       return true;
     }
+
+    localStg.remove('lastLoginUserId');
     return false;
   }
 
-  /** 提交管理员登录凭据，密码已在调用方完成 RSA 加密。 */
-  async function login(username: string, password: string, redirect = true) {
+  /**
+   * Login
+   *
+   * @param userName User name
+   * @param password Password
+   * @param [redirect=true] Whether to redirect after login. Default is `true`
+   */
+  async function login(userName: string, password: string, redirect = true) {
     startLoading();
-    try {
-      const { data: loginToken, error } = await fetchLogin(username, password);
-      if (error || !loginToken) {
-        await resetStore();
-        return false;
-      }
+
+    const { data: loginToken, error } = await fetchLogin(userName, password);
+
+    if (!error) {
       const pass = await loginByToken(loginToken);
-      if (!pass) {
-        await resetStore();
-        return false;
+
+      if (pass) {
+        // Check if the tab needs to be cleared
+        const isClear = checkTabClear();
+        let needRedirect = redirect;
+
+        if (isClear) {
+          // If the tab needs to be cleared,it means we don't need to redirect.
+          needRedirect = false;
+        }
+        await redirectFromLogin(needRedirect);
+
+        window.$notification?.success({
+          title: $t('page.login.common.loginSuccess'),
+          content: $t('page.login.common.welcomeBack', { userName: userInfo.userName }),
+          duration: 4500
+        });
       }
-      await redirectFromLogin(redirect);
-      window.$notification?.success({
-        title: $t('page.login.common.loginSuccess'),
-        content: $t('page.login.common.welcomeBack', { userName: userInfo.userName }),
-        duration: 4500
-      });
-      return true;
-    } finally {
-      endLoading();
+    } else {
+      resetStore();
     }
+
+    endLoading();
   }
 
-  /** 拉取当前管理员身份、权限编码和可见菜单。 */
+  async function loginByToken(loginToken: Api.Auth.LoginToken) {
+    // 1. stored in the localStorage, the later requests need it in headers
+    localStg.set('token', loginToken.accessToken);
+    localStg.set('refreshToken', loginToken.refreshToken);
+
+    // 2. get user info
+    const pass = await getUserInfo();
+
+    if (pass) {
+      token.value = loginToken.accessToken;
+
+      return true;
+    }
+
+    return false;
+  }
+
   async function getUserInfo() {
     const { data: info, error } = await fetchGetUserInfo();
-    if (error || !info) return false;
-    Object.assign(userInfo, {
-      userId: info.id,
-      userName: info.username,
-      roles: info.isRoot ? [import.meta.env.VITE_STATIC_SUPER_ROLE] : info.roleIds,
-      buttons: info.permissions,
-      permissions: info.permissions,
-      menus: info.menus,
-      isRoot: info.isRoot
-    });
-    return true;
+
+    if (!error) {
+      // update store
+      Object.assign(userInfo, { userId: info.id, ...info });
+
+      return true;
+    }
+
+    return false;
   }
 
   async function initUserInfo() {
     const maybeToken = getToken();
-    if (!maybeToken) return;
-    token.value = maybeToken;
-    if (!(await getUserInfo())) await resetStore();
+
+    if (maybeToken) {
+      token.value = maybeToken;
+      const pass = await getUserInfo();
+
+      if (!pass) {
+        resetStore();
+      }
+    }
   }
 
   return {
     token,
     userInfo,
     isRootAdmin,
+    isStaticSuper,
     isLogin,
     loginLoading,
     resetStore,

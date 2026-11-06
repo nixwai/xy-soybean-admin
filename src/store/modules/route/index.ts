@@ -3,16 +3,15 @@ import type { RouteRecordRaw } from 'vue-router';
 import { defineStore } from 'pinia';
 import type { CustomRoute, ElegantConstRoute, LastLevelRouteKey, RouteKey, RouteMap } from '@elegant-router/types';
 import { useBoolean } from '@sa/hooks';
-import { fetchGetConstantRoutes, fetchGetUserRoutes, fetchIsRouteExist } from '@/service/api';
 import { router } from '@/router';
 import { SetupStoreId } from '@/enum';
 import { getRouteName, getRoutePath } from '@/router/elegant/transform';
 import { createStaticRoutes, getAuthVueRoutes } from '@/router/routes';
-import { filterAuthRoutesByPermissions } from '@/router/routes/access';
 import { ROOT_ROUTE } from '@/router/routes/builtin';
 import { useAuthStore } from '../auth';
 import { useTabStore } from '../tab';
 import {
+  filterAuthRoutesByPermissions,
   filterRoutesByDev,
   getBreadcrumbsByRoute,
   getCacheRouteNames,
@@ -153,20 +152,9 @@ export const useRouteStore = defineStore(SetupStoreId.Route, () => {
   async function initConstantRoute() {
     if (isInitConstantRoute.value) return;
 
-    const staticRoute = createStaticRoutes();
+    const staticRoute = createStaticRoutes(); // 做了简化，常驻路由仅前端控制
 
-    if (authRouteMode.value === 'static') {
-      addConstantRoutes(staticRoute.constantRoutes);
-    } else {
-      const { data, error } = await fetchGetConstantRoutes();
-
-      if (!error) {
-        addConstantRoutes(data);
-      } else {
-        // if fetch constant routes failed, use static constant routes
-        addConstantRoutes(staticRoute.constantRoutes);
-      }
-    }
+    addConstantRoutes(staticRoute.constantRoutes);
 
     handleConstantAndAuthRoutes();
 
@@ -181,7 +169,7 @@ export const useRouteStore = defineStore(SetupStoreId.Route, () => {
     if (!authStore.userInfo.userId) {
       await authStore.initUserInfo();
     }
-
+    console.log(authRouteMode.value);
     if (authRouteMode.value === 'static') {
       initStaticAuthRoute();
     } else {
@@ -198,11 +186,7 @@ export const useRouteStore = defineStore(SetupStoreId.Route, () => {
     if (authStore.isRootAdmin) {
       addAuthRoutes(staticAuthRoutes);
     } else {
-      const filteredAuthRoutes = filterAuthRoutesByPermissions(
-        staticAuthRoutes,
-        authStore.userInfo.permissions,
-        authStore.isRootAdmin
-      );
+      const filteredAuthRoutes = filterAuthRoutesByPermissions(staticAuthRoutes, authStore.userInfo.permissions);
 
       addAuthRoutes(filteredAuthRoutes);
     }
@@ -214,24 +198,79 @@ export const useRouteStore = defineStore(SetupStoreId.Route, () => {
 
   /** Init dynamic auth route */
   async function initDynamicAuthRoute() {
-    const { data, error } = await fetchGetUserRoutes();
+    const { authRoutes: staticAuthRoutes } = createStaticRoutes();
+    const userMenus = authStore.userInfo.menus;
+    const menuMap = new Map(userMenus.flatMap(menu => flattenUserMenus(menu)));
 
-    if (!error) {
-      const { routes, home } = data;
+    const routes = sortRoutesByOrder(staticAuthRoutes.flatMap(route => buildDynamicRoute(route, menuMap)));
 
-      addAuthRoutes(routes);
+    console.log(routes);
 
-      handleConstantAndAuthRoutes();
+    addAuthRoutes(routes);
 
+    handleConstantAndAuthRoutes();
+
+    const home = findFirstLeafRoute(routes)?.name as undefined;
+
+    if (home) {
       setRouteHome(home);
-
       handleUpdateRootRouteRedirect(home);
-
-      setIsInitAuthRoute(true);
-    } else {
-      // if fetch user routes failed, reset store
-      authStore.resetStore();
     }
+
+    setIsInitAuthRoute(true);
+  }
+
+  /** 将后端菜单树扁平化，便于按路径匹配静态路由。 */
+  function flattenUserMenus(menu: Api.Auth.UserMenuItem): [string, Api.Auth.UserMenuItem][] {
+    return [[menu.path, menu], ...(menu.children?.flatMap(flattenUserMenus) ?? [])];
+  }
+
+  /** 按后端菜单裁剪静态路由，并补充动态菜单元数据。 */
+  function buildDynamicRoute(
+    route: ElegantConstRoute,
+    menuMap: Map<string, Api.Auth.UserMenuItem>
+  ): ElegantConstRoute[] {
+    const menu = menuMap.get(route.path);
+    const children = route.children?.flatMap(child => buildDynamicRoute(child, menuMap)) ?? [];
+
+    if (!menu && children.length === 0) {
+      return [];
+    }
+
+    const nextRoute: ElegantConstRoute = {
+      ...route,
+      meta: menu
+        ? {
+            ...route.meta,
+            title: menu.title,
+            order: menu.order,
+            permission: menu.permissionCode ?? undefined
+          }
+        : route.meta
+    };
+
+    if (children.length > 0) {
+      nextRoute.children = children;
+    } else {
+      delete nextRoute.children;
+    }
+
+    return [nextRoute];
+  }
+
+  /** 深度优先获取排序后的第一个叶子路由作为首页。 */
+  function findFirstLeafRoute(routes: ElegantConstRoute[]): ElegantConstRoute | undefined {
+    const route = routes[0];
+
+    if (!route) {
+      return undefined;
+    }
+
+    if (!route.children?.length) {
+      return route;
+    }
+
+    return findFirstLeafRoute(route.children);
   }
 
   /** handle constant and auth routes */
@@ -302,15 +341,9 @@ export const useRouteStore = defineStore(SetupStoreId.Route, () => {
     if (!routeName) {
       return false;
     }
-
-    if (authRouteMode.value === 'static') {
-      const { authRoutes: staticAuthRoutes } = createStaticRoutes();
-      return isRouteExistByRouteName(routeName, staticAuthRoutes);
-    }
-
-    const { data } = await fetchIsRouteExist(routeName);
-
-    return data;
+    // 做了简化，路由存在仅由前端控制判断
+    const { authRoutes: staticAuthRoutes } = createStaticRoutes();
+    return isRouteExistByRouteName(routeName, staticAuthRoutes);
   }
 
   /**

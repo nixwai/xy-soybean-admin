@@ -1,13 +1,7 @@
-/** 菜单编辑表单模型。 */
+/** 菜单编辑表单模型，仅承载后端允许修改的字段。 */
 export interface MenuFormModel {
-  parentId: string | null;
   title: string;
-  path: string;
-  icon: string;
   order: number;
-  permissionCode: string | null;
-  /** 是否仅根管理员可见。 */
-  isRootOnly: boolean;
   isActive: boolean;
 }
 
@@ -15,10 +9,3 @@ export interface MenuFormModel {
 export interface MenuTreeNode extends ApiManagement.Menu {
   children?: MenuTreeNode[];
 }
-
-/** 父级菜单选择器选项，使用类型别名以满足 NTreeSelect 选项的索引签名要求。 */
-export type MenuTreeOption = {
-  label: string;
-  key: string;
-  children?: MenuTreeOption[];
-};

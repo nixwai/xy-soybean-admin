@@ -26,7 +26,6 @@ declare namespace Api {
       id: string;
       title: string;
       path: string;
-      icon?: string;
       order: number;
       /** 菜单所需权限编码，为空表示登录即可见。 */
       permissionCode: string | null;

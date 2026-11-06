@@ -15,12 +15,12 @@ declare module 'vue-router' {
      */
     i18nKey?: App.I18n.I18nKey | null;
     /**
-     * Whether the route is only accessible by the backend root admin
+     * Permission of the route
      *
-     * It maps to the backend "RootOnly" guard, non-root admins never receive these routes
+     * Route can be accessed if the current user has permission
+     *
+     * It only works when the route mode is "static", if the route mode is "dynamic", it will be ignored
      */
-    rootOnly?: boolean | null;
-    /** Backend permission code required to enter the page, the root admin bypasses the check */
     permission?: string;
     /** Whether to cache the route */
     keepAlive?: boolean | null;

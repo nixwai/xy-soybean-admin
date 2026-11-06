@@ -4,6 +4,31 @@ import { isDev } from '@/constants/env';
 import { $t } from '@/locales';
 import { useSvgIcon } from '@/hooks/common/icon';
 
+/** 根据后端权限编码过滤静态管理路由。 */
+export function filterAuthRoutesByPermissions(routes: ElegantConstRoute[], permissions: string[]) {
+  return routes.flatMap(route => filterAuthRouteByPermissions(route, permissions));
+}
+
+function filterAuthRouteByPermissions(route: ElegantConstRoute, permissions: string[]): ElegantConstRoute[] {
+  const permission = route.meta?.permission;
+
+  if (permission && !permissions.includes(permission)) {
+    return [];
+  }
+
+  const filterRoute = { ...route };
+
+  if (filterRoute.children?.length) {
+    filterRoute.children = filterRoute.children.flatMap(item => filterAuthRouteByPermissions(item, permissions));
+  }
+
+  // Exclude the route if it has no children after filtering
+  if (filterRoute.children?.length === 0) {
+    return [];
+  }
+
+  return [filterRoute];
+}
 /**
  * Filter routes by `isDev` of meta
  *
