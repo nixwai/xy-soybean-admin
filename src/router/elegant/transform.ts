@@ -168,7 +168,7 @@ const routeMap: RouteMap = {
   "500": "/500",
   "home": "/home",
   "iframe-page": "/iframe-page/:url",
-  "login": "/login/:module(pwd-login|code-login|register|reset-pwd|bind-wechat)?",
+  "login": "/login/:module(pwd-login|code-login|register|reset-pwd)?",
   "system-management": "/system-management",
   "system-management_admin": "/system-management/admin",
   "system-management_audit": "/system-management/audit",

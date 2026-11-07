@@ -1,6 +1,6 @@
 const local: App.I18n.Schema = {
   system: {
-    title: '景区导游预约平台后台',
+    title: '后台管理',
     updateTitle: '系统版本更新通知',
     updateContent: '检测到系统有新版本发布，是否立即刷新页面？',
     updateConfirm: '立即刷新',
@@ -276,14 +276,11 @@ const local: App.I18n.Schema = {
       },
       resetPwd: {
         title: '重置密码'
-      },
-      bindWeChat: {
-        title: '绑定微信'
       }
     },
     home: {
       title: '工作台',
-      description: '统一管理景区导游预约平台后台的管理员、角色、权限、菜单和审计记录。',
+      description: '管理管理员、角色、权限、菜单和审计记录。',
       adminCount: '管理员',
       roleCount: '角色',
       permissionCount: '权限',

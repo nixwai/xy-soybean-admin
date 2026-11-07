@@ -1,28 +1,6 @@
-# Scenic Guide Reservation Platform Admin
+# 后台管理
 
-A desktop administration system for a scenic guide reservation platform. The current implementation manages administrators, roles, permissions, menus, and audit records through a unified dashboard.
-
-## Implemented
-
-- Administrator login and account management
-- Role management
-- Permission management
-- Menu management
-- Audit record queries
-- Dashboard statistics
-
-## Planned
-
-The following capabilities are defined in the prototype requirements and are not claimed as implemented in the current version:
-
-- Scenic site information
-- Attraction content
-- Audio resources
-- Guide management
-- Guide sessions
-- Reservation management
-
-## Tech stack
+## Tech Stack
 
 - Vue 3
 - Vite 8
@@ -33,25 +11,50 @@ The following capabilities are defined in the prototype requirements and are not
 - UnoCSS
 - pnpm
 
-## Development
+## Requirements
+
+- Node.js 20.19 or later
+- pnpm 10.5 or later
+
+## Install and Run
 
 ```bash
 pnpm install
 pnpm dev
 ```
 
-## Check and build
+The default development command uses test mode.
+
+## Build and Preview
 
 ```bash
-pnpm fmt
-pnpm typecheck
-pnpm lint
+pnpm dev:prod
 pnpm build
+pnpm build:test
+pnpm preview
 ```
 
-## Directory overview
+## Checks and Tests
 
-- `src/views`: administration page entries
-- `src/service/api`: API request definitions
-- `src/store`: global state
-- `src/locales`: Chinese and English text
+```bash
+pnpm typecheck
+pnpm test
+pnpm fmt
+pnpm lint
+```
+
+## Other Commands
+
+```bash
+pnpm gen-route
+pnpm cleanup
+pnpm upkg
+```
+
+## Environment Variables
+
+- `.env`: base environment variables
+- `.env.test`: test-mode environment variables
+- `.env.prod`: production-mode environment variables
+
+Configure the backend service URL with `VITE_SERVICE_BASE_URL`.

@@ -1,15 +1,13 @@
 {
   "name": "backstage-admin",
   "version": "2.3.0",
-  "description": "Scenic guide reservation platform administration system based on Vue 3, Vite 8, TypeScript, Naive UI and UnoCSS. 景区导游预约平台后台管理系统。",
+  "description": "后台管理",
   "keywords": [
     "Naive UI",
     "TypeScript",
     "Vite8",
     "Vue3",
-    "admin system",
-    "reservation platform",
-    "scenic guide"
+    "admin system"
   ],
   "license": "MIT",
   "type": "module",

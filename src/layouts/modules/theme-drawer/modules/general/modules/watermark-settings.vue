@@ -47,7 +47,7 @@ const isWatermarkTextVisible = computed(
         type="text"
         size="small"
         class="w-120px"
-        placeholder="景区导游预约平台后台"
+        placeholder="后台管理平台"
       />
     </SettingItem>
   </TransitionGroup>

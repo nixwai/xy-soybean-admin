@@ -1,6 +1,6 @@
 const local: App.I18n.Schema = {
   system: {
-    title: 'Scenic Guide Reservation Platform Admin',
+    title: 'Platform Admin',
     updateTitle: 'System Version Update Notification',
     updateContent: 'A new version of the system has been detected. Do you want to refresh the page immediately?',
     updateConfirm: 'Refresh immediately',
@@ -280,15 +280,11 @@ const local: App.I18n.Schema = {
       },
       resetPwd: {
         title: 'Reset Password'
-      },
-      bindWeChat: {
-        title: 'Bind WeChat'
       }
     },
     home: {
       title: 'Dashboard',
-      description:
-        'Manage administrators, roles, permissions, menus, and audit records for the scenic guide reservation platform.',
+      description: 'Manage administrators, roles, permissions, menus, and audit records.',
       adminCount: 'Administrators',
       roleCount: 'Roles',
       permissionCount: 'Permissions',

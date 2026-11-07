@@ -59,7 +59,7 @@ export const themeSettings: App.Theme.ThemeSetting = {
   },
   watermark: {
     visible: false,
-    text: '景区导游预约平台后台',
+    text: '后台管理',
     enableUserName: false,
     enableTime: false,
     timeFormat: 'YYYY-MM-DD HH:mm'

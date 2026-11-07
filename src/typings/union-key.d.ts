@@ -7,9 +7,8 @@ declare namespace UnionKey {
    * - code-login: phone code login
    * - register: register
    * - reset-pwd: reset password
-   * - bind-wechat: bind wechat
    */
-  type LoginModule = 'pwd-login' | 'code-login' | 'register' | 'reset-pwd' | 'bind-wechat';
+  type LoginModule = 'pwd-login' | 'code-login' | 'register' | 'reset-pwd';
 
   /** Theme scheme */
   type ThemeScheme = 'light' | 'dark' | 'auto';

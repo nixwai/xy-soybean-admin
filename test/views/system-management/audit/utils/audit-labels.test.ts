@@ -12,8 +12,8 @@ describe('审计标签映射', () => {
   });
 
   it('未登记的编码原样返回，避免信息丢失', () => {
-    expect(getAuditActionLabel('booking.create')).toBe('booking.create');
-    expect(getAuditResourceLabel('booking')).toBe('booking');
+    expect(getAuditActionLabel('resource.create')).toBe('resource.create');
+    expect(getAuditResourceLabel('resource')).toBe('resource');
   });
 });
 

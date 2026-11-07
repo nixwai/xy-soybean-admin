@@ -1,26 +1,4 @@
-# 景区导游预约平台后台管理系统
-
-景区导游预约平台的 PC 管理后台，当前用于维护后台账号、角色、权限、菜单和审计记录，并提供统一工作台入口。
-
-## 当前已实现
-
-- 管理员登录与管理员账号管理
-- 角色管理
-- 权限管理
-- 菜单管理
-- 审计记录查询
-- 工作台统计
-
-## 后续规划
-
-以下能力属于原型需求规划，当前版本不宣称已经实现：
-
-- 景区资料
-- 景点内容
-- 音频资源
-- 导游管理
-- 讲解场次
-- 预约管理
+# 后台管理
 
 ## 技术栈
 
@@ -33,25 +11,60 @@
 - UnoCSS
 - pnpm
 
-## 开发命令
+## 环境要求
+
+- Node.js 20.19 或更高版本
+- pnpm 10.5 或更高版本
+
+## 安装依赖
 
 ```bash
 pnpm install
+```
+
+## 启动开发环境
+
+```bash
 pnpm dev
 ```
 
-## 检查与构建
+默认使用 test 模式启动开发服务。
+
+## 启动生产模式开发服务
 
 ```bash
-pnpm fmt
-pnpm typecheck
-pnpm lint
-pnpm build
+pnpm dev:prod
 ```
 
-## 目录说明
+## 构建与预览
 
-- `src/views`：后台页面入口
-- `src/service/api`：接口请求定义
-- `src/store`：全局状态
-- `src/locales`：中英文文案
+```bash
+pnpm build
+pnpm build:test
+pnpm preview
+```
+
+## 检查与测试
+
+```bash
+pnpm typecheck
+pnpm test
+pnpm fmt
+pnpm lint
+```
+
+## 其他命令
+
+```bash
+pnpm gen-route
+pnpm cleanup
+pnpm upkg
+```
+
+## 环境变量
+
+- `.env`：基础环境变量
+- `.env.test`：test 模式环境变量
+- `.env.prod`：prod 模式环境变量
+
+后端服务地址通过 `VITE_SERVICE_BASE_URL` 配置。
