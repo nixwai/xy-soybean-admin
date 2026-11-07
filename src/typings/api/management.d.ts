@@ -173,7 +173,9 @@ declare namespace ApiManagement {
     id: string;
     actorAdminId: string | null;
     action: string;
+    actionLabel: string;
     resourceType: string;
+    resourceTypeLabel: string;
     targetId: string | null;
     details: Record<string, unknown> | null;
     succeeded: boolean;

@@ -1,21 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  formatAuditDetails,
-  getAuditActionLabel,
-  getAuditResourceLabel
-} from '@/views/system-management/audit/utils/audit-labels';
-
-describe('审计标签映射', () => {
-  it('已登记的动作和资源返回中文名称', () => {
-    expect(getAuditActionLabel('admin.role-bind')).toBe('绑定管理员角色');
-    expect(getAuditResourceLabel('permission')).toBe('权限');
-  });
-
-  it('未登记的编码原样返回，避免信息丢失', () => {
-    expect(getAuditActionLabel('resource.create')).toBe('resource.create');
-    expect(getAuditResourceLabel('resource')).toBe('resource');
-  });
-});
+import { formatAuditDetails } from '@/views/system-management/audit/utils/audit-labels';
 
 describe('formatAuditDetails', () => {
   it('将变更摘要格式化为单行文本', () => {

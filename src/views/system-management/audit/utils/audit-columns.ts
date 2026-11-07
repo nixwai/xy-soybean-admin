@@ -2,7 +2,7 @@ import { h } from 'vue';
 import { NTag, NTooltip } from 'naive-ui';
 import type { DataTableColumns } from 'naive-ui';
 import { formatDateTime } from '../../utils/datetime';
-import { formatAuditDetails, getAuditActionLabel, getAuditResourceLabel } from './audit-labels';
+import { formatAuditDetails } from './audit-labels';
 
 /** 构建审计日志表格列。 */
 export function createAuditColumns(): DataTableColumns<ApiManagement.AuditLog> {
@@ -25,7 +25,7 @@ export function createAuditColumns(): DataTableColumns<ApiManagement.AuditLog> {
       minWidth: 160,
       render: row =>
         h('div', { class: 'flex-col' }, [
-          h('span', getAuditActionLabel(row.action)),
+          h('span', row.actionLabel || row.action),
           h('span', { class: 'text-12px text-#999' }, row.action)
         ])
     },
@@ -33,7 +33,7 @@ export function createAuditColumns(): DataTableColumns<ApiManagement.AuditLog> {
       title: '资源',
       key: 'resourceType',
       width: 100,
-      render: row => getAuditResourceLabel(row.resourceType)
+      render: row => row.resourceTypeLabel || row.resourceType
     },
     {
       title: '目标 ID',
@@ -49,7 +49,11 @@ export function createAuditColumns(): DataTableColumns<ApiManagement.AuditLog> {
       render: row =>
         h(
           NTag,
-          { size: 'small', bordered: false, type: row.succeeded ? 'success' : 'error' },
+          {
+            size: 'small',
+            bordered: false,
+            type: row.succeeded ? 'success' : 'error'
+          },
           { default: () => (row.succeeded ? '成功' : '失败') }
         )
     },
