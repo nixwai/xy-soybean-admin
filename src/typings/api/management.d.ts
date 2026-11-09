@@ -195,4 +195,46 @@ declare namespace ApiManagement {
     nextCursor: string | null;
     hasMore: boolean;
   }
+  /** 素材文件夹。 */
+  interface AssetFolder {
+    id: string;
+    name: string;
+    parentId: string | null;
+    createdByAdminId: string;
+    imageCount: number;
+    createdAt: string;
+    updatedAt: string;
+  }
+  interface AssetFolderCreateRequest {
+    name: string;
+    parentId?: string | null;
+  }
+  interface AssetFolderUpdateRequest {
+    id: string;
+    name: string;
+  }
+  interface Asset {
+    id: string;
+    folderId: string | null;
+    originalName: string;
+    url: string;
+    storageKey: string;
+    mimeType: string;
+    size: number;
+    width: number | null;
+    height: number | null;
+    createdByAdminId: string;
+    createdAt: string;
+    updatedAt: string;
+  }
+  interface AssetQuery extends PageQuery {
+    folderId?: string;
+    keyword?: string;
+  }
+  interface BatchAssetUploadResponse {
+    success: Asset[];
+    failed: Array<{ filename: string; reason: string }>;
+    totalCount: number;
+    successCount: number;
+  }
 }
