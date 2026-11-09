@@ -22,7 +22,9 @@ import {
   deleteAsset,
   deleteAssetFolder,
   fetchAssetFolders,
+  fetchAllAssetFolders,
   fetchAssets,
+  fetchAllAssets,
   moveAsset,
   uploadAssets
 } from '@/service/api';
@@ -36,6 +38,8 @@ const canUpload = computed(() => hasAuth('asset.image.upload'));
 const canMove = computed(() => hasAuth('asset.image.move'));
 const canDeleteImage = computed(() => hasAuth('asset.image.delete'));
 const canReadAll = computed(() => hasAuth('asset.image.read-all'));
+const canReadAllFolders = computed(() => hasAuth('asset.folder.read-all'));
+const scope = ref<'mine' | 'all'>('mine');
 const folders = ref<ApiManagement.AssetFolder[]>([]);
 const assets = ref<ApiManagement.Asset[]>([]);
 const loading = ref(false);
@@ -48,6 +52,10 @@ const pageSize = ref(24);
 const total = ref(0);
 const fileInput = ref<HTMLInputElement>();
 
+const scopeOptions = [
+  { label: '仅我的素材', value: 'mine' },
+  { label: '全部素材', value: 'all' }
+];
 const folderOptions = computed(() => [
   { label: '未分类', value: '' },
   ...folders.value.map(folder => ({ label: folder.name, value: folder.id }))
@@ -68,17 +76,18 @@ const treeData = computed<TreeOption[]>(() => {
 });
 
 async function loadFolders() {
-  const { data } = await fetchAssetFolders();
+  const { data } = canReadAllFolders.value ? await fetchAllAssetFolders() : await fetchAssetFolders();
   folders.value = data?.items ?? [];
 }
 async function loadAssets() {
   loading.value = true;
-  const { data } = await fetchAssets({
+  const query = {
     page: page.value,
     pageSize: pageSize.value,
     folderId: selectedFolderId.value ?? undefined,
     keyword: keyword.value || undefined
-  });
+  };
+  const { data } = canReadAll.value && scope.value === 'all' ? await fetchAllAssets(query) : await fetchAssets(query);
   assets.value = data?.items ?? [];
   total.value = data?.total ?? 0;
   loading.value = false;
@@ -177,8 +186,8 @@ onMounted(refresh);
         <NSpace align="center">
           <NSelect
             v-if="canReadAll"
-            v-model:value="selectedFolderId"
-            :options="folderOptions"
+            v-model:value="scope"
+            :options="scopeOptions"
             class="w-150px"
             @update:value="
               () => {

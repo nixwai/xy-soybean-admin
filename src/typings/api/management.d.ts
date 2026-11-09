@@ -201,6 +201,7 @@ declare namespace ApiManagement {
     name: string;
     parentId: string | null;
     createdByAdminId: string;
+    ownerId: string;
     imageCount: number;
     createdAt: string;
     updatedAt: string;
@@ -224,6 +225,7 @@ declare namespace ApiManagement {
     width: number | null;
     height: number | null;
     createdByAdminId: string;
+    ownerId: string;
     createdAt: string;
     updatedAt: string;
   }
