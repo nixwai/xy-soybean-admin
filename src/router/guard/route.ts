@@ -30,7 +30,7 @@ export function createRouteGuard(router: Router) {
 
     const hasPermission = authStore.userInfo.permissions.includes(routePermission);
 
-    const hasAuth = authStore.isStaticSuper || !routePermission || hasPermission;
+    const hasAuth = authStore.isRootAdmin || !routePermission || hasPermission;
 
     // if it is login route when logged in, then switch to the root page
     if (to.name === loginRoute && isLogin) {
@@ -156,7 +156,12 @@ function handleRouteSwitch(to: RouteLocationNormalized, from: RouteLocationNorma
   if (to.meta.href) {
     window.open(to.meta.href, '_blank');
 
-    return { path: from.fullPath, replace: true, query: from.query, hash: to.hash };
+    return {
+      path: from.fullPath,
+      replace: true,
+      query: from.query,
+      hash: to.hash
+    };
   }
 }
 

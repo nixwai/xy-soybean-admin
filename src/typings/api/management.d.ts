@@ -195,6 +195,16 @@ declare namespace ApiManagement {
     nextCursor: string | null;
     hasMore: boolean;
   }
+  interface AssetUploadLimits {
+    maxFiles: number;
+    maxFileSize: number;
+    maxBatchSize: number;
+  }
+  interface AssetOwner {
+    id: string;
+    username: string;
+    isActive: boolean;
+  }
   /** 素材文件夹。 */
   interface AssetFolder {
     id: string;
@@ -209,10 +219,12 @@ declare namespace ApiManagement {
   interface AssetFolderCreateRequest {
     name: string;
     parentId?: string | null;
+    ownerId?: string;
   }
   interface AssetFolderUpdateRequest {
     id: string;
     name: string;
+    ownerId?: string;
   }
   interface Asset {
     id: string;
@@ -230,8 +242,10 @@ declare namespace ApiManagement {
     updatedAt: string;
   }
   interface AssetQuery extends PageQuery {
+    unclassified?: boolean;
     folderId?: string;
     keyword?: string;
+    ownerId?: string;
   }
   interface BatchAssetUploadResponse {
     success: Asset[];
