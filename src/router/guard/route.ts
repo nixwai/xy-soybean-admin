@@ -30,7 +30,7 @@ export function createRouteGuard(router: Router) {
 
     const hasPermission = authStore.userInfo.permissions.includes(routePermission);
 
-    const hasAuth = authStore.isStaticSuper || !routePermission || hasPermission;
+    const hasAuth = authStore.isRootAdmin || !routePermission || hasPermission;
 
     // if it is login route when logged in, then switch to the root page
     if (to.name === loginRoute && isLogin) {
