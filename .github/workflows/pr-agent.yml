@@ -59,6 +59,8 @@ jobs:
 
       - name: PR Agent action step
         id: pragent
+        # AI 评审依赖外部模型服务，失败不应阻断代码提交和合并。
+        continue-on-error: true
         if: ${{ steps.guard.outputs.is_fork != 'true' }}
         # 固定到完整 commit SHA（= v0.47.0），而不是可变 tag。
         # tag 可被上游重新指向，而这个 step 会拿到付费的 OPENAI_KEY 和有写权限的
