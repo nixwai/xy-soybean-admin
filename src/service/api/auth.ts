@@ -1,11 +1,7 @@
 import { request } from '../request';
 
-export interface AdminPublicKeyResponse {
-  publicKey: string;
-}
-
 export function fetchAdminPublicKey() {
-  return request<AdminPublicKeyResponse>({ url: '/auth/admin/public-key' });
+  return request<Api.Auth.AdminPublicKeyResponse>({ url: '/auth/admin/public-key' });
 }
 
 export function fetchLogin(username: string, password: string) {

@@ -1,5 +1,9 @@
 declare namespace Api {
   namespace Auth {
+    interface AdminPublicKeyResponse {
+      publicKey: string;
+    }
+
     /** 登录接口返回的管理员公开身份。 */
     interface AdminIdentity {
       id: string;
