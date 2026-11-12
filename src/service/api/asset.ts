@@ -1,11 +1,15 @@
 import { request } from '../request';
 
 export function fetchAssetUploadLimits() {
-  return request<ApiManagement.AssetUploadLimits>({ url: '/asset/upload-limits' });
+  return request<ApiManagement.AssetUploadLimits>({
+    url: '/asset/upload-limits'
+  });
 }
 
 export function fetchAssetOwners() {
-  return request<ApiManagement.ListResponse<ApiManagement.AssetOwner>>({ url: '/asset/owners' });
+  return request<ApiManagement.ListResponse<ApiManagement.AssetOwner>>({
+    url: '/asset/owners'
+  });
 }
 
 export function fetchAssetFolders(ownerId?: string) {
@@ -29,13 +33,17 @@ export function createAssetFolder(data: ApiManagement.AssetFolderCreateRequest) 
 }
 export function updateAssetFolder(data: ApiManagement.AssetFolderUpdateRequest) {
   return request<ApiManagement.AssetFolder>({
-    url: `/asset/folders/${data.id}`,
-    method: 'patch',
-    data: { name: data.name, ownerId: data.ownerId }
+    url: '/asset/folders/update',
+    method: 'post',
+    data
   });
 }
 export function deleteAssetFolder(id: string, ownerId?: string) {
-  return request<null>({ url: `/asset/folders/${id}`, method: 'delete', params: ownerId ? { ownerId } : undefined });
+  return request<null>({
+    url: '/asset/folders/soft-delete',
+    method: 'post',
+    data: { id, ownerId }
+  });
 }
 export function fetchAssets(params: ApiManagement.AssetQuery) {
   return request<ApiManagement.PageResponse<ApiManagement.Asset>>({
@@ -44,7 +52,10 @@ export function fetchAssets(params: ApiManagement.AssetQuery) {
   });
 }
 export function fetchAllAssets(params: ApiManagement.AssetQuery) {
-  return request<ApiManagement.PageResponse<ApiManagement.Asset>>({ url: '/asset/images/all', params });
+  return request<ApiManagement.PageResponse<ApiManagement.Asset>>({
+    url: '/asset/images/all',
+    params
+  });
 }
 export async function uploadAssets(files: File[], folderId: string | null, ownerId?: string) {
   const data = new FormData();
@@ -78,11 +89,15 @@ function isFailedUpload(value: unknown): value is ApiManagement.BatchAssetUpload
 }
 export function moveAsset(id: string, folderId: string | null, ownerId?: string) {
   return request<ApiManagement.Asset>({
-    url: `/asset/images/${id}/folder`,
-    method: 'patch',
-    data: { folderId, ownerId }
+    url: '/asset/images/move',
+    method: 'post',
+    data: { id, folderId, ownerId }
   });
 }
 export function deleteAsset(id: string, ownerId?: string) {
-  return request<null>({ url: `/asset/images/${id}`, method: 'delete', params: ownerId ? { ownerId } : undefined });
+  return request<null>({
+    url: '/asset/images/soft-delete',
+    method: 'post',
+    data: { id, ownerId }
+  });
 }

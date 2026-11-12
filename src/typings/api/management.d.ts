@@ -231,7 +231,6 @@ declare namespace ApiManagement {
     folderId: string | null;
     originalName: string;
     url: string;
-    storageKey: string;
     mimeType: string;
     size: number;
     width: number | null;
