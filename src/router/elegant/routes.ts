@@ -76,6 +76,29 @@ export const generatedRoutes: GeneratedRoute[] = [
     }
   },
   {
+    name: 'operation-management',
+    path: '/operation-management',
+    component: 'layout.base',
+    meta: {
+      title: 'operation-management',
+      i18nKey: 'route.operation-management',
+      icon: 'carbon:catalog',
+      order: 3
+    },
+    children: [
+      {
+        name: 'operation-management_asset',
+        path: '/operation-management/asset',
+        component: 'view.operation-management_asset',
+        meta: {
+          title: 'operation-management_asset',
+          i18nKey: 'route.operation-management_asset',
+          order: 1
+        }
+      }
+    ]
+  },
+  {
     name: 'system-management',
     path: '/system-management',
     component: 'layout.base',

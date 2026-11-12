@@ -23,6 +23,8 @@ declare module "@elegant-router/types" {
     "home": "/home";
     "iframe-page": "/iframe-page/:url";
     "login": "/login/:module(pwd-login|code-login|register|reset-pwd)?";
+    "operation-management": "/operation-management";
+    "operation-management_asset": "/operation-management/asset";
     "system-management": "/system-management";
     "system-management_admin": "/system-management/admin";
     "system-management_audit": "/system-management/audit";
@@ -66,6 +68,7 @@ declare module "@elegant-router/types" {
     | "home"
     | "iframe-page"
     | "login"
+    | "operation-management"
     | "system-management"
   >;
 
@@ -89,6 +92,7 @@ declare module "@elegant-router/types" {
     | "iframe-page"
     | "login"
     | "home"
+    | "operation-management_asset"
     | "system-management_admin"
     | "system-management_audit"
     | "system-management_menu"

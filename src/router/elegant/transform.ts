@@ -169,6 +169,8 @@ const routeMap: RouteMap = {
   "home": "/home",
   "iframe-page": "/iframe-page/:url",
   "login": "/login/:module(pwd-login|code-login|register|reset-pwd)?",
+  "operation-management": "/operation-management",
+  "operation-management_asset": "/operation-management/asset",
   "system-management": "/system-management",
   "system-management_admin": "/system-management/admin",
   "system-management_audit": "/system-management/audit",
