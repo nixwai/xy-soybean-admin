@@ -156,12 +156,7 @@ function handleRouteSwitch(to: RouteLocationNormalized, from: RouteLocationNorma
   if (to.meta.href) {
     window.open(to.meta.href, '_blank');
 
-    return {
-      path: from.fullPath,
-      replace: true,
-      query: from.query,
-      hash: to.hash
-    };
+    return { path: from.fullPath, replace: true, query: from.query, hash: to.hash };
   }
 }
 

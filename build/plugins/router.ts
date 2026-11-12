@@ -27,8 +27,6 @@ export function setupElegantRouter() {
       const constantRoutes: RouteKey[] = ['login', '403', '404', '500'];
 
       const routeMetaMap: Partial<Record<RouteKey, Partial<RouteMeta>>> = {
-        'operation-management': { icon: 'carbon:catalog', order: 3 },
-        'operation-management_asset': { order: 1 },
         'system-management': {
           icon: 'carbon:settings',
           order: 2

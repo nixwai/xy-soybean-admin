@@ -226,8 +226,6 @@ const local: App.I18n.Schema = {
     500: '服务器错误',
     'iframe-page': '外链页面',
     home: '工作台',
-    'operation-management': '运营管理',
-    'operation-management_asset': '素材管理',
     'system-management': '系统管理',
     'system-management_admin': '管理员管理',
     'system-management_role': '角色管理',
