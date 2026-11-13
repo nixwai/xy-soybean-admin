@@ -21,4 +21,6 @@ export type AssetFolderFormMode = 'create' | 'rename';
 export interface AssetFolderFormModel {
   /** 文件夹名称。 */
   name: string;
+  /** 全局新增时的目标拥有者 ID。 */
+  ownerId: string;
 }

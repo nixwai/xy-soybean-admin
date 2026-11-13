@@ -1,6 +1,6 @@
 import { computed, ref } from 'vue';
 import { createAssetFolder, updateAssetFolder } from '@/service/api';
-import { createAssetFolderForm } from '../config/constants';
+import { ASSET_FOLDER_OWNER_ID_PATTERN, createAssetFolderForm } from '../config/constants';
 import type { AssetFolderFormMode, AssetFolderFormModel, AssetTreeOption } from '../typings';
 
 interface AssetFolderFormSubmitOptions {
@@ -17,6 +17,8 @@ export function useAssetFolderFormSubmit(options: AssetFolderFormSubmitOptions) 
   const form = ref<AssetFolderFormModel>(createAssetFolderForm());
   /** 新建时的父级展示名称，账号根节点表示建在账号下。 */
   const parentLabel = computed(() => (mode.value === 'create' ? (target.value?.label ?? '') : ''));
+  /** 是否为全局新增，需手动指定拥有者且不绑定树节点。 */
+  const isGlobalCreate = computed(() => mode.value === 'create' && !target.value);
 
   /** 在指定节点下新建子文件夹。 */
   function openCreate(row: AssetTreeOption | null) {
@@ -27,34 +29,39 @@ export function useAssetFolderFormSubmit(options: AssetFolderFormSubmitOptions) 
     showModal.value = true;
   }
 
+  /** 打开全部视图下的顶层新增弹窗，拥有者由用户手动输入。 */
+  function openGlobalCreate() {
+    mode.value = 'create';
+    target.value = null;
+    form.value = createAssetFolderForm();
+    showModal.value = true;
+  }
+
   /** 重命名指定文件夹。 */
   function openRename(row: AssetTreeOption | null) {
     if (!row || row.nodeType !== 'folder') return;
     mode.value = 'rename';
     target.value = row;
-    form.value = { name: row.label };
+    form.value = { name: row.label, ownerId: row.ownerId };
     showModal.value = true;
   }
 
   /** 按当前模式提交新建或重命名，成功后关闭弹窗并刷新。 */
   async function submit() {
-    const node = target.value;
     const name = form.value.name.trim();
-    if (!node || !name || submitting.value) return;
+    if (!name || submitting.value) return;
+
+    const payload = getCreatePayload();
+    if (mode.value === 'create' && !payload) return;
 
     submitting.value = true;
     try {
-      const result =
-        mode.value === 'create'
-          ? await createAssetFolder(
-              node.nodeType === 'folder'
-                ? { name, ownerId: node.ownerId, parentId: node.key }
-                : { name, ownerId: node.ownerId }
-            )
-          : await updateAssetFolder({ id: node.key, name });
+      const result = payload
+        ? await createAssetFolder(payload)
+        : await updateAssetFolder({ id: target.value?.key ?? '', name });
       if (result.error) return;
 
-      window.$message?.success(mode.value === 'create' ? '文件夹已创建' : '文件夹已重命名');
+      window.$message?.success(payload ? '文件夹已创建' : '文件夹已重命名');
       showModal.value = false;
       await options.onSuccess();
     } finally {
@@ -62,5 +69,34 @@ export function useAssetFolderFormSubmit(options: AssetFolderFormSubmitOptions) 
     }
   }
 
-  return { showModal, submitting, mode, form, parentLabel, openCreate, openRename, submit };
+  function getCreatePayload(): ApiManagement.AssetFolderCreateRequest | null {
+    if (mode.value !== 'create') return null;
+
+    if (isGlobalCreate.value) {
+      const ownerId = form.value.ownerId.trim();
+      if (!ASSET_FOLDER_OWNER_ID_PATTERN.test(ownerId)) return null;
+      return { name: form.value.name.trim(), ownerId };
+    }
+
+    const node = target.value;
+    if (!node) return null;
+
+    const name = form.value.name.trim();
+    return node.nodeType === 'folder'
+      ? { name, ownerId: node.ownerId, parentId: node.key }
+      : { name, ownerId: node.ownerId };
+  }
+
+  return {
+    showModal,
+    submitting,
+    mode,
+    form,
+    isGlobalCreate,
+    parentLabel,
+    openCreate,
+    openGlobalCreate,
+    openRename,
+    submit
+  };
 }

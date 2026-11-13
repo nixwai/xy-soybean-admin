@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted } from 'vue';
-import { NCard, NDropdown, NEmpty, NSpace, NSpin, NSwitch, NTree } from 'naive-ui';
+import { NButton, NCard, NDropdown, NEmpty, NSpace, NSpin, NSwitch, NTree } from 'naive-ui';
 import { useAssetFolderContextMenu } from './hooks/use-asset-folder-context-menu';
 import { useAssetFolderDelete } from './hooks/use-asset-folder-delete';
 import { useAssetFolderFormSubmit } from './hooks/use-asset-folder-form-submit';
@@ -8,16 +8,29 @@ import { useAssetFolderTree } from './hooks/use-asset-folder-tree';
 import FolderDeleteModal from './components/folder-delete-modal.vue';
 import FolderFormModal from './components/folder-form-modal.vue';
 
-const { canViewAll, changeScope, expandedKeys, loadTree, loading, scopeAll, selectedKeys, selectedNode, treeData } =
-  useAssetFolderTree();
+const {
+  canCreateTopLevel,
+  canViewAll,
+  changeScope,
+  expandedKeys,
+  loadTree,
+  loading,
+  personalOwnerNode,
+  scopeAll,
+  selectedKeys,
+  selectedNode,
+  treeData
+} = useAssetFolderTree();
 const { closeContextMenu, contextMenu, contextOptions, contextTarget, nodeProps } = useAssetFolderContextMenu();
 const {
   showModal: showFormModal,
   submitting: formSubmitting,
   mode: formMode,
   form: folderForm,
+  isGlobalCreate,
   parentLabel,
   openCreate,
+  openGlobalCreate,
   openRename,
   submit: submitFolderForm
 } = useAssetFolderFormSubmit({ onSuccess: loadTree });
@@ -39,6 +52,12 @@ function handleContextMenuSelect(key: string | number) {
   else if (key === 'delete') openDelete(target);
 }
 
+/** 顶层新建入口：全部视图手动指定拥有者，个人视图默认当前账号。 */
+function handleCreateTopLevel() {
+  if (scopeAll.value) openGlobalCreate();
+  else openCreate(personalOwnerNode.value);
+}
+
 onMounted(() => void loadTree());
 </script>
 
@@ -47,15 +66,30 @@ onMounted(() => void loadTree());
     <NCard class="w-320px shrink-0" :bordered="false" title="素材文件夹">
       <template #header-extra>
         <NSpace align="center" :size="6">
-          <span class="text-12px text-#999">仅自己</span>
           <NSwitch
             :value="scopeAll"
             :disabled="!canViewAll"
+            :rail-style="() => ({ minWidth: '72px' })"
             size="small"
             aria-label="素材查看范围"
             @update:value="changeScope"
-          />
-          <span class="text-12px text-#999">查看所有</span>
+          >
+            <template #checked>全部</template>
+            <template #unchecked>个人</template>
+          </NSwitch>
+          <NButton
+            v-if="canCreateTopLevel"
+            quaternary
+            circle
+            size="small"
+            :title="scopeAll ? '为指定管理员新建文件夹' : '新建顶层文件夹'"
+            :aria-label="scopeAll ? '为指定管理员新建文件夹' : '新建顶层文件夹'"
+            @click="handleCreateTopLevel"
+          >
+            <template #icon>
+              <icon-ic-round-plus class="text-icon" />
+            </template>
+          </NButton>
         </NSpace>
       </template>
       <NSpin :show="loading">
@@ -96,6 +130,7 @@ onMounted(() => void loadTree());
       :mode="formMode"
       :submitting="formSubmitting"
       :parent-label="parentLabel"
+      :require-owner-id="isGlobalCreate"
       @submit="submitFolderForm"
     />
     <FolderDeleteModal

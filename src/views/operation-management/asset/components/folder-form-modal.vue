@@ -2,7 +2,11 @@
 import { computed, watch } from 'vue';
 import { NButton, NForm, NFormItem, NInput, NModal, NSpace } from 'naive-ui';
 import { useNaiveForm } from '@/hooks/common/form';
-import { ASSET_FOLDER_FORM_RULES, ASSET_FOLDER_NAME_MAX_LENGTH } from '../config/constants';
+import {
+  ASSET_FOLDER_FORM_RULES,
+  ASSET_FOLDER_GLOBAL_CREATE_RULES,
+  ASSET_FOLDER_NAME_MAX_LENGTH
+} from '../config/constants';
 import type { AssetFolderFormMode, AssetFolderFormModel } from '../typings';
 
 interface Props {
@@ -12,16 +16,18 @@ interface Props {
   parentLabel?: string;
   /** 提交中状态。 */
   submitting?: boolean;
+  /** 是否需要手动输入拥有者 ID。 */
+  requireOwnerId?: boolean;
 }
 
-const props = withDefaults(defineProps<Props>(), { parentLabel: '', submitting: false });
+const props = withDefaults(defineProps<Props>(), { parentLabel: '', submitting: false, requireOwnerId: false });
 const visible = defineModel<boolean>('show', { required: true });
 const form = defineModel<AssetFolderFormModel>('form', { required: true });
 const emit = defineEmits<{ submit: [] }>();
 
 const { formRef, restoreValidation } = useNaiveForm();
 const title = computed(() => (props.mode === 'create' ? '新建文件夹' : '重命名文件夹'));
-const rules = computed(() => ASSET_FOLDER_FORM_RULES);
+const rules = computed(() => (props.requireOwnerId ? ASSET_FOLDER_GLOBAL_CREATE_RULES : ASSET_FOLDER_FORM_RULES));
 
 watch(visible, value => {
   if (value) restoreValidation();
@@ -44,7 +50,7 @@ async function handleSubmit() {
       :model="form"
       :rules="rules"
       label-placement="left"
-      label-width="90"
+      label-width="100"
       require-mark-placement="right-hanging"
     >
       <NFormItem label="文件夹名称" path="name">
@@ -55,6 +61,9 @@ async function handleSubmit() {
           placeholder="请输入文件夹名称"
           @keyup.enter="handleSubmit"
         />
+      </NFormItem>
+      <NFormItem v-if="props.requireOwnerId" label="用户 ID" path="ownerId">
+        <NInput v-model:value="form.ownerId" placeholder="请输入 ID" @keyup.enter="handleSubmit" />
       </NFormItem>
     </NForm>
     <div v-if="props.parentLabel" class="mb-12px text-12px text-#999">父级：{{ props.parentLabel }}</div>
