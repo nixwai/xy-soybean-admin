@@ -1,16 +1,12 @@
 <script setup lang="ts">
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { NButton, NCard, NDataTable, NSpace } from 'naive-ui';
 import type { PaginationProps } from 'naive-ui';
 import { useAuthStore } from '@/store/modules/auth';
 import { PAGE_SIZE_OPTIONS } from '../config/constants';
 import { useRoleOptions } from '../hooks/use-role-options';
 import { createAdminColumns } from './utils/admin-columns';
-import { useAdminDelete } from './hooks/use-admin-delete';
-import { useAdminFormSubmit } from './hooks/use-admin-form-submit';
-import { useAdminPasswordReset } from './hooks/use-admin-password-reset';
 import { useAdminQuery } from './hooks/use-admin-query';
-import { useAdminRoleAssign } from './hooks/use-admin-role-assign';
 import { useAdminStatus } from './hooks/use-admin-status';
 import AdminDeleteModal from './components/admin-delete-modal.vue';
 import AdminFormModal from './components/admin-form-modal.vue';
@@ -20,52 +16,22 @@ import AdminRoleModal from './components/admin-role-modal.vue';
 const authStore = useAuthStore();
 const { loading, items, total, page, pageSize, load, changePage, changePageSize } = useAdminQuery();
 const { roleLoading, roles, roleNameMap, loadRoles } = useRoleOptions();
-const {
-  showModal: formModalVisible,
-  submitting: formSubmitting,
-  editing,
-  form: adminForm,
-  needCurrentPassword,
-  openCreate,
-  openEdit,
-  submit: submitAdminForm
-} = useAdminFormSubmit({ onSuccess: load });
-const {
-  showModal: roleModalVisible,
-  submitting: roleSubmitting,
-  target: roleTarget,
-  form: roleForm,
-  roleChanges,
-  open: openRoleAssign,
-  submit: submitRoleAssign
-} = useAdminRoleAssign({ onSuccess: load });
-const {
-  showModal: passwordModalVisible,
-  submitting: passwordSubmitting,
-  target: passwordTarget,
-  form: passwordForm,
-  open: openPasswordReset,
-  submit: submitPasswordReset
-} = useAdminPasswordReset();
 const { pendingId, toggle: toggleStatus } = useAdminStatus({ onSuccess: load });
-const {
-  showModal: deleteModalVisible,
-  submitting: deleteSubmitting,
-  target: deleteTarget,
-  form: deleteForm,
-  open: openDelete,
-  submit: submitDelete
-} = useAdminDelete({ onSuccess: load });
+
+const formModalRef = ref<InstanceType<typeof AdminFormModal> | null>(null);
+const roleModalRef = ref<InstanceType<typeof AdminRoleModal> | null>(null);
+const passwordModalRef = ref<InstanceType<typeof AdminPasswordModal> | null>(null);
+const deleteModalRef = ref<InstanceType<typeof AdminDeleteModal> | null>(null);
 
 const columns = computed(() =>
   createAdminColumns({
     roleNameMap,
     currentAdminId: authStore.userInfo.userId,
     pendingStatusId: pendingId,
-    onEdit: openEdit,
-    onRoleAssign: openRoleAssign,
-    onPassword: openPasswordReset,
-    onDelete: openDelete,
+    onEdit: row => formModalRef.value?.openEdit(row),
+    onRoleAssign: row => roleModalRef.value?.open(row),
+    onPassword: row => passwordModalRef.value?.open(row),
+    onDelete: row => deleteModalRef.value?.open(row),
     onToggleStatus: toggleStatus
   })
 );
@@ -94,7 +60,7 @@ onMounted(refresh);
     <template #header-extra>
       <NSpace :size="8">
         <NButton size="small" :loading="loading" @click="refresh">刷新</NButton>
-        <NButton size="small" type="primary" @click="openCreate">新增管理员</NButton>
+        <NButton size="small" type="primary" @click="formModalRef?.openCreate()">新增管理员</NButton>
       </NSpace>
     </template>
     <NDataTable
@@ -107,37 +73,9 @@ onMounted(refresh);
       :scroll-x="1180"
       :row-key="row => row.id"
     />
-    <AdminFormModal
-      v-model:show="formModalVisible"
-      v-model:form="adminForm"
-      :editing="editing"
-      :need-current-password="needCurrentPassword"
-      :submitting="formSubmitting"
-      @submit="submitAdminForm"
-    />
-    <AdminRoleModal
-      v-model:show="roleModalVisible"
-      v-model:form="roleForm"
-      :target="roleTarget"
-      :roles="roles"
-      :changes="roleChanges"
-      :roles-loading="roleLoading"
-      :submitting="roleSubmitting"
-      @submit="submitRoleAssign"
-    />
-    <AdminPasswordModal
-      v-model:show="passwordModalVisible"
-      v-model:form="passwordForm"
-      :target="passwordTarget"
-      :submitting="passwordSubmitting"
-      @submit="submitPasswordReset"
-    />
-    <AdminDeleteModal
-      v-model:show="deleteModalVisible"
-      v-model:form="deleteForm"
-      :target="deleteTarget"
-      :submitting="deleteSubmitting"
-      @submit="submitDelete"
-    />
+    <AdminFormModal ref="formModalRef" @success="load" />
+    <AdminRoleModal ref="roleModalRef" :roles="roles" :roles-loading="roleLoading" @success="load" />
+    <AdminPasswordModal ref="passwordModalRef" @success="load" />
+    <AdminDeleteModal ref="deleteModalRef" @success="load" />
   </NCard>
 </template>

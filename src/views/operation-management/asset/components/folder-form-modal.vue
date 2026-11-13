@@ -7,27 +7,28 @@ import {
   ASSET_FOLDER_GLOBAL_CREATE_RULES,
   ASSET_FOLDER_NAME_MAX_LENGTH
 } from '../config/constants';
-import type { AssetFolderFormMode, AssetFolderFormModel } from '../typings';
+import { useAssetFolderFormSubmit } from '../hooks/use-asset-folder-form-submit';
 
-interface Props {
-  /** 弹窗模式，决定标题与提交语义。 */
-  mode: AssetFolderFormMode;
-  /** 新建时展示的父级名称，重命名时为空。 */
-  parentLabel?: string;
-  /** 提交中状态。 */
-  submitting?: boolean;
-  /** 是否需要手动输入拥有者 ID。 */
-  requireOwnerId?: boolean;
-}
+const emit = defineEmits<{ success: [] }>();
 
-const props = withDefaults(defineProps<Props>(), { parentLabel: '', submitting: false, requireOwnerId: false });
-const visible = defineModel<boolean>('show', { required: true });
-const form = defineModel<AssetFolderFormModel>('form', { required: true });
-const emit = defineEmits<{ submit: [] }>();
+const {
+  showModal: visible,
+  submitting,
+  mode,
+  form,
+  isGlobalCreate: requireOwnerId,
+  parentLabel,
+  openCreate,
+  openGlobalCreate,
+  openRename,
+  submit: submitForm
+} = useAssetFolderFormSubmit({
+  onSuccess: () => emit('success')
+});
 
 const { formRef, restoreValidation } = useNaiveForm();
-const title = computed(() => (props.mode === 'create' ? '新建文件夹' : '重命名文件夹'));
-const rules = computed(() => (props.requireOwnerId ? ASSET_FOLDER_GLOBAL_CREATE_RULES : ASSET_FOLDER_FORM_RULES));
+const title = computed(() => (mode.value === 'create' ? '新建文件夹' : '重命名文件夹'));
+const rules = computed(() => (requireOwnerId.value ? ASSET_FOLDER_GLOBAL_CREATE_RULES : ASSET_FOLDER_FORM_RULES));
 
 watch(visible, value => {
   if (value) restoreValidation();
@@ -39,8 +40,14 @@ async function handleSubmit() {
   } catch {
     return;
   }
-  emit('submit');
+  await submitForm();
 }
+
+defineExpose({
+  openCreate,
+  openGlobalCreate,
+  openRename
+});
 </script>
 
 <template>
@@ -62,15 +69,15 @@ async function handleSubmit() {
           @keyup.enter="handleSubmit"
         />
       </NFormItem>
-      <NFormItem v-if="props.requireOwnerId" label="用户 ID" path="ownerId">
+      <NFormItem v-if="requireOwnerId" label="用户 ID" path="ownerId">
         <NInput v-model:value="form.ownerId" placeholder="请输入 ID" @keyup.enter="handleSubmit" />
       </NFormItem>
     </NForm>
-    <div v-if="props.parentLabel" class="mb-12px text-12px text-#999">父级：{{ props.parentLabel }}</div>
+    <div v-if="parentLabel" class="mb-12px text-12px text-#999">父级：{{ parentLabel }}</div>
     <template #footer>
       <NSpace justify="end">
         <NButton @click="visible = false">取消</NButton>
-        <NButton type="primary" :loading="props.submitting" @click="handleSubmit">确定</NButton>
+        <NButton type="primary" :loading="submitting" @click="handleSubmit">确定</NButton>
       </NSpace>
     </template>
   </NModal>

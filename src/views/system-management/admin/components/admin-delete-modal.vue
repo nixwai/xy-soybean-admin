@@ -3,21 +3,21 @@ import { computed, watch } from 'vue';
 import { NAlert, NButton, NForm, NFormItem, NInput, NModal, NSpace } from 'naive-ui';
 import { useNaiveForm } from '@/hooks/common/form';
 import { createAdminDeleteFormRules } from '../config/rules';
-import type { AdminDeleteModel } from '../typings';
+import { useAdminDelete } from '../hooks/use-admin-delete';
 
-interface Props {
-  /** 待删除的管理员。 */
-  target: ApiManagement.Admin | null;
-  submitting?: boolean;
-}
-
-const props = withDefaults(defineProps<Props>(), { submitting: false });
-const visible = defineModel<boolean>('show', { required: true });
-const form = defineModel<AdminDeleteModel>('form', { required: true });
-const emit = defineEmits<{ submit: [] }>();
+const emit = defineEmits<{ success: [] }>();
+const {
+  showModal: visible,
+  submitting,
+  target,
+  form,
+  open,
+  submit
+} = useAdminDelete({
+  onSuccess: () => emit('success')
+});
 
 const { formRef, restoreValidation } = useNaiveForm();
-
 const rules = computed(() => createAdminDeleteFormRules());
 
 watch(visible, value => {
@@ -30,15 +30,19 @@ async function handleSubmit() {
   } catch {
     return;
   }
-  emit('submit');
+  await submit();
 }
+
+defineExpose({
+  open
+});
 </script>
 
 <template>
   <NModal
     v-model:show="visible"
     preset="card"
-    :title="`删除管理员 - ${props.target?.username ?? ''}`"
+    :title="`删除管理员 - ${target?.username ?? ''}`"
     class="w-520px"
     :mask-closable="false"
   >

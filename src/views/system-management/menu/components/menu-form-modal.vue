@@ -3,39 +3,48 @@ import { watch } from 'vue';
 import { NButton, NForm, NFormItem, NInput, NInputNumber, NModal, NSpace, NSwitch } from 'naive-ui';
 import type { FormRules } from 'naive-ui';
 import { useNaiveForm } from '@/hooks/common/form';
-import type { MenuFormModel } from '../typings';
+import { useMenuFormSubmit } from '../hooks/use-menu-form-submit';
 
-interface Props {
-  editing: ApiManagement.Menu | null;
-  submitting?: boolean;
-}
-const props = withDefaults(defineProps<Props>(), { submitting: false });
-const visible = defineModel<boolean>('show', { required: true });
-const form = defineModel<MenuFormModel>('form', { required: true });
-const emit = defineEmits<{ submit: [] }>();
+const emit = defineEmits<{ success: [] }>();
+const {
+  showModal: visible,
+  submitting,
+  editing,
+  form,
+  openEdit,
+  submit
+} = useMenuFormSubmit({
+  onSuccess: () => emit('success')
+});
 const { formRef, restoreValidation } = useNaiveForm();
 const rules: FormRules = {
   title: [{ required: true, message: '请输入菜单标题', trigger: ['input', 'blur'] }],
   order: [{ required: true, type: 'number', message: '请输入排序值', trigger: ['input', 'blur'] }]
 };
+
 watch(visible, value => {
   if (value) restoreValidation();
 });
+
 async function handleSubmit() {
   try {
     await formRef.value?.validate();
   } catch {
     return;
   }
-  emit('submit');
+  await submit();
 }
+
+defineExpose({
+  openEdit
+});
 </script>
 
 <template>
   <NModal
     v-model:show="visible"
     preset="card"
-    :title="`编辑菜单 - ${props.editing?.menuKey ?? ''}`"
+    :title="`编辑菜单 - ${editing?.menuKey ?? ''}`"
     class="w-520px"
     :mask-closable="false"
   >

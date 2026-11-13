@@ -1,53 +1,32 @@
 <script setup lang="ts">
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { NButton, NCard, NDataTable, NSpace } from 'naive-ui';
 import type { PaginationProps } from 'naive-ui';
 import { PAGE_SIZE_OPTIONS } from '../config/constants';
 import { usePermissionCatalog } from '../hooks/use-permission-catalog';
 import { createRoleColumns } from './utils/role-columns';
 import { useRoleDelete } from './hooks/use-role-delete';
-import { useRoleFormSubmit } from './hooks/use-role-form-submit';
-import { useRolePermissionAssign } from './hooks/use-role-permission-assign';
 import { useRoleQuery } from './hooks/use-role-query';
 import { useRoleStatus } from './hooks/use-role-status';
 import RoleFormModal from './components/role-form-modal.vue';
 import RolePermissionModal from './components/role-permission-modal.vue';
 
 const { loading, items, total, page, pageSize, load, changePage, changePageSize } = useRoleQuery();
-const { permissionLoading, permissionGroups, permissions, loadPermissionCatalog } = usePermissionCatalog();
-const {
-  showModal: formModalVisible,
-  submitting: formSubmitting,
-  editing,
-  form: roleForm,
-  openCreate,
-  openEdit,
-  submit: submitRoleForm
-} = useRoleFormSubmit({ onSuccess: load });
-const {
-  showModal: permissionModalVisible,
-  submitting: permissionSubmitting,
-  target: permissionTarget,
-  form: permissionForm,
-  unmanagedPermissionIds,
-  permissionChanges,
-  open: openPermissionAssign,
-  submit: submitPermissionAssign
-} = useRolePermissionAssign({ onSuccess: load });
+const { permissionLoading, permissionGroups, loadPermissionCatalog } = usePermissionCatalog();
 const { pendingId, toggle: toggleStatus } = useRoleStatus({ onSuccess: load });
 const { remove: deleteRole } = useRoleDelete({ onSuccess: load });
+const formModalRef = ref<InstanceType<typeof RoleFormModal> | null>(null);
+const permissionModalRef = ref<InstanceType<typeof RolePermissionModal> | null>(null);
 
-/** 打开权限分配弹窗，并以可分配目录界定本次可调整的权限范围。 */
+/** 打开权限分配弹窗，并以当前可分配权限目录作为调整范围。 */
 function handlePermissionAssign(row: ApiManagement.Role) {
-  openPermissionAssign(
-    row,
-    permissions.value.map(item => item.id)
-  );
+  permissionModalRef.value?.open(row);
 }
+
 const columns = computed(() =>
   createRoleColumns({
     pendingStatusId: pendingId,
-    onEdit: openEdit,
+    onEdit: row => formModalRef.value?.openEdit(row),
     onPermissionAssign: handlePermissionAssign,
     onDelete: deleteRole,
     onToggleStatus: toggleStatus
@@ -78,7 +57,7 @@ onMounted(refresh);
     <template #header-extra>
       <NSpace :size="8">
         <NButton size="small" :loading="loading" @click="refresh">刷新</NButton>
-        <NButton size="small" type="primary" @click="openCreate">新增角色</NButton>
+        <NButton size="small" type="primary" @click="formModalRef?.openCreate()">新增角色</NButton>
       </NSpace>
     </template>
     <NDataTable
@@ -91,23 +70,12 @@ onMounted(refresh);
       :scroll-x="1120"
       :row-key="row => row.id"
     />
-    <RoleFormModal
-      v-model:show="formModalVisible"
-      v-model:form="roleForm"
-      :editing="editing"
-      :submitting="formSubmitting"
-      @submit="submitRoleForm"
-    />
+    <RoleFormModal ref="formModalRef" @success="load" />
     <RolePermissionModal
-      v-model:show="permissionModalVisible"
-      v-model:form="permissionForm"
-      :target="permissionTarget"
+      ref="permissionModalRef"
       :groups="permissionGroups"
-      :changes="permissionChanges"
-      :unmanaged-permission-ids="unmanagedPermissionIds"
       :loading="permissionLoading"
-      :submitting="permissionSubmitting"
-      @submit="submitPermissionAssign"
+      @success="load"
     />
   </NCard>
 </template>

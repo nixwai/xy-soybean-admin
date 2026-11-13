@@ -15,9 +15,22 @@ export function useAdminRoleAssign(options: AdminRoleAssignOptions) {
 
   /** 打开角色分配弹窗，并以管理员当前已绑定角色作为初始值。 */
   function open(row: ApiManagement.Admin) {
-    target.value = row;
+    target.value = { ...row, roleIds: [...row.roleIds] };
     form.value = { roleIds: [...row.roleIds] };
     showModal.value = true;
+  }
+
+  /** 将已成功处理的绑定关系写回本地快照，使失败后重试只提交未完成的差异。 */
+  function markRoleBound(roleId: string) {
+    const admin = target.value;
+    if (!admin || admin.roleIds.includes(roleId)) return;
+    target.value = { ...admin, roleIds: [...admin.roleIds, roleId] };
+  }
+
+  function markRoleUnbound(roleId: string) {
+    const admin = target.value;
+    if (!admin || !admin.roleIds.includes(roleId)) return;
+    target.value = { ...admin, roleIds: admin.roleIds.filter(id => id !== roleId) };
   }
 
   /** 计算需要新增和解除的角色绑定关系。 */
@@ -51,6 +64,7 @@ export function useAdminRoleAssign(options: AdminRoleAssignOptions) {
           failed = true;
           break;
         }
+        markRoleBound(roleId);
       }
 
       if (!failed) {
@@ -60,14 +74,15 @@ export function useAdminRoleAssign(options: AdminRoleAssignOptions) {
             failed = true;
             break;
           }
+          markRoleUnbound(roleId);
         }
       }
 
+      if (failed) return;
+
       showModal.value = false;
       await options.onSuccess();
-      if (!failed) {
-        window.$message?.success('角色绑定已更新');
-      }
+      window.$message?.success('角色绑定已更新');
     } finally {
       submitting.value = false;
     }

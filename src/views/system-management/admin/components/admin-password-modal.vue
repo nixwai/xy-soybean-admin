@@ -3,21 +3,21 @@ import { computed, watch } from 'vue';
 import { NButton, NForm, NFormItem, NInput, NModal, NSpace } from 'naive-ui';
 import { useNaiveForm } from '@/hooks/common/form';
 import { createAdminPasswordFormRules } from '../config/rules';
-import type { AdminPasswordFormModel } from '../typings';
+import { useAdminPasswordReset } from '../hooks/use-admin-password-reset';
 
-interface Props {
-  /** 待重置密码的管理员。 */
-  target: ApiManagement.Admin | null;
-  submitting?: boolean;
-}
-
-const props = withDefaults(defineProps<Props>(), { submitting: false });
-const visible = defineModel<boolean>('show', { required: true });
-const form = defineModel<AdminPasswordFormModel>('form', { required: true });
-const emit = defineEmits<{ submit: [] }>();
+const emit = defineEmits<{ success: [] }>();
+const {
+  showModal: visible,
+  submitting,
+  target,
+  form,
+  open,
+  submit
+} = useAdminPasswordReset({
+  onSuccess: () => emit('success')
+});
 
 const { formRef, restoreValidation } = useNaiveForm();
-
 const rules = computed(() => createAdminPasswordFormRules(() => form.value.password));
 
 watch(visible, value => {
@@ -30,15 +30,19 @@ async function handleSubmit() {
   } catch {
     return;
   }
-  emit('submit');
+  await submit();
 }
+
+defineExpose({
+  open
+});
 </script>
 
 <template>
   <NModal
     v-model:show="visible"
     preset="card"
-    :title="`重置密码 - ${props.target?.username ?? ''}`"
+    :title="`重置密码 - ${target?.username ?? ''}`"
     class="w-520px"
     :mask-closable="false"
   >

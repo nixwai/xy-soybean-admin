@@ -1,9 +1,7 @@
 <script setup lang="ts">
-import { onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
 import { NButton, NCard, NDropdown, NEmpty, NSpace, NSpin, NSwitch, NTree } from 'naive-ui';
 import { useAssetFolderContextMenu } from './hooks/use-asset-folder-context-menu';
-import { useAssetFolderDelete } from './hooks/use-asset-folder-delete';
-import { useAssetFolderFormSubmit } from './hooks/use-asset-folder-form-submit';
 import { useAssetFolderTree } from './hooks/use-asset-folder-tree';
 import FolderDeleteModal from './components/folder-delete-modal.vue';
 import FolderFormModal from './components/folder-form-modal.vue';
@@ -22,40 +20,24 @@ const {
   treeData
 } = useAssetFolderTree();
 const { closeContextMenu, contextMenu, contextOptions, contextTarget, nodeProps } = useAssetFolderContextMenu();
-const {
-  showModal: showFormModal,
-  submitting: formSubmitting,
-  mode: formMode,
-  form: folderForm,
-  isGlobalCreate,
-  parentLabel,
-  openCreate,
-  openGlobalCreate,
-  openRename,
-  submit: submitFolderForm
-} = useAssetFolderFormSubmit({ onSuccess: loadTree });
-const {
-  showModal: showDeleteModal,
-  submitting: deleteSubmitting,
-  target: deleteTarget,
-  open: openDelete,
-  submit: submitFolderDelete
-} = useAssetFolderDelete({ onSuccess: loadTree });
+
+const formModalRef = ref<InstanceType<typeof FolderFormModal> | null>(null);
+const deleteModalRef = ref<InstanceType<typeof FolderDeleteModal> | null>(null);
 
 /** 右键菜单动作分派，节点是否可操作由各动作流程判断。 */
 function handleContextMenuSelect(key: string | number) {
   closeContextMenu();
   const target = contextTarget.value;
   if (!target) return;
-  if (key === 'create') openCreate(target);
-  else if (key === 'rename') openRename(target);
-  else if (key === 'delete') openDelete(target);
+  if (key === 'create') formModalRef.value?.openCreate(target);
+  else if (key === 'rename') formModalRef.value?.openRename(target);
+  else if (key === 'delete') deleteModalRef.value?.open(target);
 }
 
 /** 顶层新建入口：全部视图手动指定拥有者，个人视图默认当前账号。 */
 function handleCreateTopLevel() {
-  if (scopeAll.value) openGlobalCreate();
-  else openCreate(personalOwnerNode.value);
+  if (scopeAll.value) formModalRef.value?.openGlobalCreate();
+  else formModalRef.value?.openCreate(personalOwnerNode.value);
 }
 
 onMounted(() => void loadTree());
@@ -124,20 +106,7 @@ onMounted(() => void loadTree());
       @clickoutside="closeContextMenu"
     />
 
-    <FolderFormModal
-      v-model:show="showFormModal"
-      v-model:form="folderForm"
-      :mode="formMode"
-      :submitting="formSubmitting"
-      :parent-label="parentLabel"
-      :require-owner-id="isGlobalCreate"
-      @submit="submitFolderForm"
-    />
-    <FolderDeleteModal
-      v-model:show="showDeleteModal"
-      :folder-name="deleteTarget?.label ?? ''"
-      :submitting="deleteSubmitting"
-      @submit="submitFolderDelete"
-    />
+    <FolderFormModal ref="formModalRef" @success="loadTree" />
+    <FolderDeleteModal ref="deleteModalRef" @success="loadTree" />
   </div>
 </template>

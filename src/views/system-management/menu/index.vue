@@ -3,19 +3,22 @@ import { computed, onMounted, ref } from 'vue';
 import { NButton, NCard, NDataTable, NSpace } from 'naive-ui';
 import { createMenuColumns } from './utils/menu-columns';
 import { buildMenuTree } from './utils/menu-tree';
-import { useMenuFormSubmit } from './hooks/use-menu-form-submit';
 import { useMenuQuery } from './hooks/use-menu-query';
 import { useMenuStatus } from './hooks/use-menu-status';
 import MenuFormModal from './components/menu-form-modal.vue';
 
 const { loading, items, load } = useMenuQuery();
 const expandedRowKeys = ref<string[]>([]);
-const { showModal, submitting, editing, form, openEdit, submit } = useMenuFormSubmit({ onSuccess: load });
 const { pendingId, toggle: toggleStatus } = useMenuStatus({ onSuccess: load });
+const formModalRef = ref<InstanceType<typeof MenuFormModal> | null>(null);
 
 const menuTree = computed(() => buildMenuTree(items.value));
 const columns = computed(() =>
-  createMenuColumns({ pendingStatusId: pendingId, onEdit: openEdit, onToggleStatus: toggleStatus })
+  createMenuColumns({
+    pendingStatusId: pendingId,
+    onEdit: row => formModalRef.value?.openEdit(row),
+    onToggleStatus: toggleStatus
+  })
 );
 
 async function refresh() {
@@ -43,12 +46,6 @@ onMounted(refresh);
       :scroll-x="1450"
       :row-key="row => row.menuKey"
     />
-    <MenuFormModal
-      v-model:show="showModal"
-      v-model:form="form"
-      :editing="editing"
-      :submitting="submitting"
-      @submit="submit"
-    />
+    <MenuFormModal ref="formModalRef" @success="load" />
   </NCard>
 </template>

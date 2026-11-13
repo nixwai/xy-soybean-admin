@@ -20,10 +20,26 @@ export function useRolePermissionAssign(options: RolePermissionAssignOptions) {
   /** 打开权限分配弹窗，仅保留仍出现在可分配目录中的权限作为初始值。 */
   function open(row: ApiManagement.Role, assignableIds: string[]) {
     const assignable = new Set(assignableIds);
-    target.value = row;
+    target.value = { ...row, permissionIds: [...row.permissionIds] };
     manageablePermissionIds.value = row.permissionIds.filter(id => assignable.has(id));
     form.value = { permissionIds: [...manageablePermissionIds.value] };
     showModal.value = true;
+  }
+
+  /** 将已成功处理的绑定关系写回本地快照，使失败后重试只提交未完成的差异。 */
+  function markPermissionBound(permissionId: string) {
+    const role = target.value;
+    if (!role || role.permissionIds.includes(permissionId)) return;
+    target.value = { ...role, permissionIds: [...role.permissionIds, permissionId] };
+    if (!manageablePermissionIds.value.includes(permissionId)) {
+      manageablePermissionIds.value = [...manageablePermissionIds.value, permissionId];
+    }
+  }
+
+  function markPermissionUnbound(permissionId: string) {
+    const role = target.value;
+    if (!role || !role.permissionIds.includes(permissionId)) return;
+    target.value = { ...role, permissionIds: role.permissionIds.filter(id => id !== permissionId) };
   }
 
   /** 角色已绑定但不在可分配目录中的权限，无法在此界面调整。 */
@@ -64,6 +80,7 @@ export function useRolePermissionAssign(options: RolePermissionAssignOptions) {
           failed = true;
           break;
         }
+        markPermissionBound(permissionId);
       }
 
       if (!failed) {
@@ -73,14 +90,15 @@ export function useRolePermissionAssign(options: RolePermissionAssignOptions) {
             failed = true;
             break;
           }
+          markPermissionUnbound(permissionId);
         }
       }
 
+      if (failed) return;
+
       showModal.value = false;
       await options.onSuccess();
-      if (!failed) {
-        window.$message?.success('角色权限已更新');
-      }
+      window.$message?.success('角色权限已更新');
     } finally {
       submitting.value = false;
     }

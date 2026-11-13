@@ -3,38 +3,39 @@ import { computed, watch } from 'vue';
 import { NAlert, NButton, NForm, NFormItem, NInput, NModal, NSpace, NSwitch } from 'naive-ui';
 import { useNaiveForm } from '@/hooks/common/form';
 import { createAdminFormRules } from '../config/rules';
-import type { AdminFormModel } from '../typings';
+import { useAdminFormSubmit } from '../hooks/use-admin-form-submit';
 
-interface Props {
-  /** 正在编辑的管理员，为空表示新增。 */
-  editing: ApiManagement.Admin | null;
-  /** 本次提交是否需要复核当前登录管理员密码。 */
-  needCurrentPassword: boolean;
-  submitting?: boolean;
-}
+const emit = defineEmits<{ success: [] }>();
 
-const props = withDefaults(defineProps<Props>(), { submitting: false });
-const visible = defineModel<boolean>('show', { required: true });
-const form = defineModel<AdminFormModel>('form', { required: true });
-const emit = defineEmits<{ submit: [] }>();
+const {
+  showModal: visible,
+  submitting,
+  editing,
+  form,
+  needCurrentPassword,
+  openCreate,
+  openEdit,
+  submit
+} = useAdminFormSubmit({
+  onSuccess: () => emit('success')
+});
 
 const { formRef, restoreValidation } = useNaiveForm();
 
 const rules = computed(() =>
   createAdminFormRules({
-    isEdit: Boolean(props.editing),
-    needCurrentPassword: props.needCurrentPassword,
+    isEdit: Boolean(editing.value),
+    needCurrentPassword: needCurrentPassword.value,
     getPassword: () => form.value.password
   })
 );
 
 const currentPasswordTip = computed(() => {
   if (form.value.isRoot) return '变更根管理员身份需要复核当前登录管理员密码。';
-  if (props.editing?.isRoot) return '目标为根管理员，任何修改都需要复核当前登录管理员密码。';
+  if (editing.value?.isRoot) return '目标为根管理员，任何修改都需要复核当前登录管理员密码。';
   return '修改密码需要复核当前登录管理员密码。';
 });
 
-// 弹窗每次打开时清理上一次的校验残留
 watch(visible, value => {
   if (value) restoreValidation();
 });
@@ -45,8 +46,13 @@ async function handleSubmit() {
   } catch {
     return;
   }
-  emit('submit');
+  await submit();
 }
+
+defineExpose({
+  openCreate,
+  openEdit
+});
 </script>
 
 <template>
