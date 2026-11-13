@@ -4,7 +4,7 @@ import type { RoleFormModel, RolePermissionAssignModel } from '../typings';
 export const ROLE_PAGE_SIZE = 20;
 
 /** 后端角色编码规则：以小写字母开头，允许小写字母、数字、冒号、下划线和连字符。 */
-export const ROLE_CODE_PATTERN = /^[a-z][a-z0-9:_-]+$/;
+export const ROLE_CODE_PATTERN = /^[a-z][a-z0-9:_-]*$/;
 
 /** 角色表单校验规则，与后端编码格式和长度约束保持一致。 */
 export const ROLE_FORM_RULES: Record<string, App.Global.FormRule[]> = {
@@ -12,7 +12,7 @@ export const ROLE_FORM_RULES: Record<string, App.Global.FormRule[]> = {
     { required: true, message: '请输入角色编码', trigger: ['input', 'blur'] },
     {
       pattern: ROLE_CODE_PATTERN,
-      message: '编码需以小写字母开头，仅允许小写字母、数字、冒号、下划线和连字符',
+      message: '以小写字母开头，仅允许小写字母、数字、冒号、下划线和连字符',
       trigger: ['input', 'blur']
     },
     { max: 64, message: '角色编码不能超过 64 个字符', trigger: ['input', 'blur'] }
