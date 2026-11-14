@@ -21,8 +21,8 @@ declare namespace ApiManagement {
     description?: string | null;
     isActive?: boolean;
   }
-  interface RolePermissionBindingRequest {
+  interface RolePermissionBatchRequest {
     roleId: string;
-    permissionId: string;
+    permissionIds: string[];
   }
 }

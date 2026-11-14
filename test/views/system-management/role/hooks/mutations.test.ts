@@ -1,14 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { bindRolePermission, unbindRolePermission } from '@/service/api';
+import { bindRolePermissions, unbindRolePermissions } from '@/service/api';
 import { useRolePermissionAssign } from '@/views/system-management/role/hooks/use-role-permission-assign';
 
 vi.mock('@/service/api', () => ({
-  bindRolePermission: vi.fn(),
-  unbindRolePermission: vi.fn()
+  bindRolePermissions: vi.fn(),
+  unbindRolePermissions: vi.fn()
 }));
 
-const bindMock = vi.mocked(bindRolePermission);
-const unbindMock = vi.mocked(unbindRolePermission);
+const bindMock = vi.mocked(bindRolePermissions);
+const unbindMock = vi.mocked(unbindRolePermissions);
 const response = { data: null, error: null, response: null } as never;
 vi.stubGlobal('window', { $message: { success: vi.fn() } });
 const role = {
@@ -19,7 +19,7 @@ const role = {
   isActive: true,
   isSystem: false,
   isProtected: false,
-  permissionIds: ['permission-old', 'permission-keep'],
+  permissionIds: ['permission-invalid', 'permission-old', 'permission-keep'],
   deletedAt: null
 } as ApiManagement.Role;
 
@@ -32,21 +32,29 @@ describe('useRolePermissionAssign', () => {
 
   it('只提交可管理权限的绑定差异', async () => {
     const onSuccess = vi.fn();
-    const { form, open, submit, unmanagedPermissionIds } = useRolePermissionAssign({ onSuccess });
+    const { form, open, submit } = useRolePermissionAssign({ onSuccess });
 
-    open(role, ['permission-keep', 'permission-new']);
-    form.value.permissionIds = ['permission-keep', 'permission-new'];
+    open(role, ['permission-keep', 'permission-new', 'permission-next']);
+    form.value.permissionIds = ['permission-keep', 'permission-new', 'permission-next'];
     await submit();
 
-    expect(bindMock).toHaveBeenCalledWith({ roleId: 'role-1', permissionId: 'permission-new' });
-    expect(unbindMock).toHaveBeenCalledWith({ roleId: 'role-1', permissionId: 'permission-old' });
+    expect(bindMock).toHaveBeenCalledWith({
+      roleId: 'role-1',
+      permissionIds: ['permission-new', 'permission-next']
+    });
+    expect(unbindMock).toHaveBeenCalledWith({
+      roleId: 'role-1',
+      permissionIds: ['permission-invalid', 'permission-old']
+    });
     expect(onSuccess).toHaveBeenCalledOnce();
   });
 
   it('没有权限变化时直接关闭而不发请求', async () => {
-    const { open, submit, showModal } = useRolePermissionAssign({ onSuccess: vi.fn() });
+    const { open, submit, showModal } = useRolePermissionAssign({
+      onSuccess: vi.fn()
+    });
 
-    open(role, ['permission-old', 'permission-keep']);
+    open(role, ['permission-invalid', 'permission-old', 'permission-keep']);
     await submit();
 
     expect(bindMock).not.toHaveBeenCalled();
@@ -55,12 +63,16 @@ describe('useRolePermissionAssign', () => {
   });
 
   it('权限绑定部分失败时保留弹窗，重试只提交未完成的差异', async () => {
-    unbindMock.mockResolvedValueOnce({ data: null, error: new Error('failed'), response: null } as never);
+    unbindMock.mockResolvedValueOnce({
+      data: null,
+      error: new Error('failed'),
+      response: null
+    } as never);
     const onSuccess = vi.fn();
     const { form, open, submit, showModal, submitting } = useRolePermissionAssign({ onSuccess });
 
-    open(role, ['permission-keep', 'permission-new']);
-    form.value.permissionIds = ['permission-keep', 'permission-new'];
+    open(role, ['permission-keep', 'permission-new', 'permission-next']);
+    form.value.permissionIds = ['permission-keep', 'permission-new', 'permission-next'];
     await submit();
 
     expect(showModal.value).toBe(true);
@@ -73,5 +85,31 @@ describe('useRolePermissionAssign', () => {
     expect(unbindMock).toHaveBeenCalledTimes(2);
     expect(showModal.value).toBe(false);
     expect(onSuccess).toHaveBeenCalledOnce();
+  });
+
+  it('提交期间阻止重复提交', async () => {
+    let resolveBind!: (value: typeof response) => void;
+    const pendingBind = new Promise<typeof response>(resolve => {
+      resolveBind = resolve;
+    });
+    bindMock.mockReturnValueOnce(pendingBind as never);
+    const onSuccess = vi.fn();
+    const { form, open, submit, submitting } = useRolePermissionAssign({ onSuccess });
+
+    open(role, ['permission-keep', 'permission-new']);
+    form.value.permissionIds = ['permission-keep', 'permission-new'];
+    const firstSubmit = submit();
+
+    expect(submitting.value).toBe(true);
+    await submit();
+    expect(bindMock).toHaveBeenCalledOnce();
+    expect(unbindMock).not.toHaveBeenCalled();
+
+    resolveBind(response);
+    await firstSubmit;
+
+    expect(unbindMock).toHaveBeenCalledOnce();
+    expect(onSuccess).toHaveBeenCalledOnce();
+    expect(submitting.value).toBe(false);
   });
 });

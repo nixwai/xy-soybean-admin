@@ -1,5 +1,5 @@
 import { computed, ref } from 'vue';
-import { bindRolePermission, unbindRolePermission } from '@/service/api';
+import { bindRolePermissions, unbindRolePermissions } from '@/service/api';
 import { createRolePermissionAssignForm } from '../config/constants';
 import type { RolePermissionAssignModel } from '../typings';
 
@@ -7,7 +7,7 @@ interface RolePermissionAssignOptions {
   onSuccess: () => void | Promise<void>;
 }
 
-/** 角色权限分配，后端只提供单个权限的绑定和解绑接口，这里按差异逐个提交。 */
+/** 角色权限分配，按绑定和解绑差异分别批量提交。 */
 export function useRolePermissionAssign(options: RolePermissionAssignOptions) {
   const showModal = ref(false);
   const submitting = ref(false);
@@ -17,7 +17,7 @@ export function useRolePermissionAssign(options: RolePermissionAssignOptions) {
   /** 打开弹窗时可调整权限的快照，避免用户勾选变化影响不可调整权限的计算。 */
   const manageablePermissionIds = ref<string[]>([]);
 
-  /** 打开权限分配弹窗，仅保留仍出现在可分配目录中的权限作为初始值。 */
+  /** 打开权限分配弹窗，仅将当前可分配目录中的权限作为可勾选初始值。 */
   function open(row: ApiManagement.Role, assignableIds: string[]) {
     const assignable = new Set(assignableIds);
     target.value = { ...row, permissionIds: [...row.permissionIds] };
@@ -26,23 +26,37 @@ export function useRolePermissionAssign(options: RolePermissionAssignOptions) {
     showModal.value = true;
   }
 
-  /** 将已成功处理的绑定关系写回本地快照，使失败后重试只提交未完成的差异。 */
-  function markPermissionBound(permissionId: string) {
+  /** 将批量绑定成功的关系写回本地快照，使失败后重试只提交未完成的差异。 */
+  function markPermissionsBound(permissionIds: string[]) {
     const role = target.value;
-    if (!role || role.permissionIds.includes(permissionId)) return;
-    target.value = { ...role, permissionIds: [...role.permissionIds, permissionId] };
-    if (!manageablePermissionIds.value.includes(permissionId)) {
-      manageablePermissionIds.value = [...manageablePermissionIds.value, permissionId];
+    if (!role || permissionIds.length === 0) return;
+    const boundIds = new Set(role.permissionIds);
+    const nextPermissionIds = [...role.permissionIds];
+    for (const permissionId of permissionIds) {
+      if (boundIds.has(permissionId)) continue;
+      boundIds.add(permissionId);
+      nextPermissionIds.push(permissionId);
     }
+    target.value = { ...role, permissionIds: nextPermissionIds };
+    const manageableIds = new Set(manageablePermissionIds.value);
+    manageablePermissionIds.value = [
+      ...manageablePermissionIds.value,
+      ...permissionIds.filter(id => !manageableIds.has(id))
+    ];
   }
 
-  function markPermissionUnbound(permissionId: string) {
+  /** 将批量解绑成功的关系写回本地快照。 */
+  function markPermissionsUnbound(permissionIds: string[]) {
     const role = target.value;
-    if (!role || !role.permissionIds.includes(permissionId)) return;
-    target.value = { ...role, permissionIds: role.permissionIds.filter(id => id !== permissionId) };
+    if (!role || permissionIds.length === 0) return;
+    const unboundIds = new Set(permissionIds);
+    target.value = {
+      ...role,
+      permissionIds: role.permissionIds.filter(id => !unboundIds.has(id))
+    };
   }
 
-  /** 角色已绑定但不在可分配目录中的权限，无法在此界面调整。 */
+  /** 角色已绑定但不在可分配目录中的权限，保存时通过批量解绑清理。 */
   const unmanagedPermissionIds = computed(() => {
     if (!target.value) return [];
     const manageable = new Set(manageablePermissionIds.value);
@@ -72,29 +86,23 @@ export function useRolePermissionAssign(options: RolePermissionAssignOptions) {
 
     submitting.value = true;
     try {
-      // 顺序提交并在首个失败处停止，避免部分成功后继续产生无效请求
-      let failed = false;
-      for (const permissionId of bindPermissionIds) {
-        const { error } = await bindRolePermission({ roleId: role.id, permissionId });
-        if (error) {
-          failed = true;
-          break;
-        }
-        markPermissionBound(permissionId);
+      if (bindPermissionIds.length) {
+        const { error } = await bindRolePermissions({
+          roleId: role.id,
+          permissionIds: bindPermissionIds
+        });
+        if (error) return;
+        markPermissionsBound(bindPermissionIds);
       }
 
-      if (!failed) {
-        for (const permissionId of unbindPermissionIds) {
-          const { error } = await unbindRolePermission({ roleId: role.id, permissionId });
-          if (error) {
-            failed = true;
-            break;
-          }
-          markPermissionUnbound(permissionId);
-        }
+      if (unbindPermissionIds.length) {
+        const { error } = await unbindRolePermissions({
+          roleId: role.id,
+          permissionIds: unbindPermissionIds
+        });
+        if (error) return;
+        markPermissionsUnbound(unbindPermissionIds);
       }
-
-      if (failed) return;
 
       showModal.value = false;
       await options.onSuccess();
@@ -104,5 +112,14 @@ export function useRolePermissionAssign(options: RolePermissionAssignOptions) {
     }
   }
 
-  return { showModal, submitting, target, form, unmanagedPermissionIds, permissionChanges, open, submit };
+  return {
+    showModal,
+    submitting,
+    target,
+    form,
+    unmanagedPermissionIds,
+    permissionChanges,
+    open,
+    submit
+  };
 }

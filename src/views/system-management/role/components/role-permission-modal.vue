@@ -84,7 +84,9 @@ defineExpose({
       </NCheckboxGroup>
       <NAlert type="info" :bordered="false" class="mt-8px">{{ changeSummary }}</NAlert>
       <NAlert v-if="unmanagedPermissionIds.length" type="warning" :bordered="false" class="mt-8px">
-        该角色还绑定了 {{ unmanagedPermissionIds.length }} 项当前不可分配的权限，本次保存不会影响它们。
+        该角色还绑定了
+        {{ unmanagedPermissionIds.length }}
+        项当前不可分配或已失效的权限，本次保存会解除这些无效绑定。
       </NAlert>
     </NSpin>
     <template #footer>

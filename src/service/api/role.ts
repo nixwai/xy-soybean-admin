@@ -20,12 +20,12 @@ export function softDeleteRole(data: ApiManagement.IdRequest) {
   return request<null>({ url: '/role/soft-delete', method: 'post', data });
 }
 
-/** 为角色绑定单个权限，仅可绑定启用且可分配的非受保护权限。 */
-export function bindRolePermission(data: ApiManagement.RolePermissionBindingRequest) {
+/** 为角色批量绑定权限，仅可绑定启用且可分配的非受保护权限。 */
+export function bindRolePermissions(data: ApiManagement.RolePermissionBatchRequest) {
   return request<null>({ url: '/role/permission-bind', method: 'post', data });
 }
 
-/** 解除角色的单个权限绑定。 */
-export function unbindRolePermission(data: ApiManagement.RolePermissionBindingRequest) {
+/** 批量解除角色权限绑定，服务端允许清理已失效的权限关联。 */
+export function unbindRolePermissions(data: ApiManagement.RolePermissionBatchRequest) {
   return request<null>({ url: '/role/permission-unbind', method: 'post', data });
 }
