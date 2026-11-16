@@ -234,6 +234,7 @@ const local: App.I18n.Schema = {
     'operation-management_asset': 'Asset Library',
     'system-management': 'System Management',
     'system-management_admin': 'Administrators',
+    'system-management_user': 'User Management',
     'system-management_role': 'Roles',
     'system-management_permission': 'Permissions',
     'system-management_menu': 'Menus',

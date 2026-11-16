@@ -158,6 +158,16 @@ export const generatedRoutes: GeneratedRoute[] = [
           i18nKey: 'route.system-management_role',
           order: 2
         }
+      },
+      {
+        name: 'system-management_user',
+        path: '/system-management/user',
+        component: 'view.system-management_user',
+        meta: {
+          title: 'system-management_user',
+          i18nKey: 'route.system-management_user',
+          order: 2
+        }
       }
     ]
   }

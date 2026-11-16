@@ -5,5 +5,6 @@ export * from './auth';
 export * from './menu';
 export * from './permission';
 export * from './role';
+export * from './user';
 
 export * from './route';

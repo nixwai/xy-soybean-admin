@@ -31,6 +31,7 @@ declare module "@elegant-router/types" {
     "system-management_menu": "/system-management/menu";
     "system-management_permission": "/system-management/permission";
     "system-management_role": "/system-management/role";
+    "system-management_user": "/system-management/user";
   };
 
   /**
@@ -98,6 +99,7 @@ declare module "@elegant-router/types" {
     | "system-management_menu"
     | "system-management_permission"
     | "system-management_role"
+    | "system-management_user"
   >;
 
   /**

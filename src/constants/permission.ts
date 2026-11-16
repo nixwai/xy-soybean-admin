@@ -2,6 +2,10 @@
 export const PERMISSION_CODE = {
   /** 查看管理员、角色和权限变更审计。 */
   AUDIT_READ: 'system.audit.read',
+  /** 查看微信用户列表。 */
+  USER_READ: 'system.user.read',
+  /** 更新微信用户资料或启用状态。 */
+  USER_UPDATE: 'system.user.update',
   /** 查看自己的素材文件夹。 */
   ASSET_FOLDER_READ: 'asset.folder.read',
   /** 查看和管理全部拥有者的素材文件夹。 */

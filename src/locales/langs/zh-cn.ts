@@ -230,6 +230,7 @@ const local: App.I18n.Schema = {
     'operation-management_asset': '素材管理',
     'system-management': '系统管理',
     'system-management_admin': '管理员管理',
+    'system-management_user': '用户管理',
     'system-management_role': '角色管理',
     'system-management_permission': '权限管理',
     'system-management_menu': '菜单管理',

@@ -34,6 +34,7 @@ export function setupElegantRouter() {
           order: 2
         },
         'system-management_admin': { order: 1 },
+        'system-management_user': { order: 2 },
         'system-management_role': { order: 2 },
         'system-management_permission': { order: 3 },
         'system-management_menu': { order: 4 },
