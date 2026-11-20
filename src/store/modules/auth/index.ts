@@ -48,7 +48,7 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
   async function resetStore() {
     const refreshToken = localStg.get('refreshToken');
     if (refreshToken) {
-      await fetchLogout(refreshToken).catch(() => undefined);
+      fetchLogout(refreshToken).catch(() => undefined);
     }
 
     recordUserId();

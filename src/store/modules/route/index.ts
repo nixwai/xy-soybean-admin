@@ -169,7 +169,6 @@ export const useRouteStore = defineStore(SetupStoreId.Route, () => {
     if (!authStore.userInfo.userId) {
       await authStore.initUserInfo();
     }
-    console.log(authRouteMode.value);
     if (authRouteMode.value === 'static') {
       initStaticAuthRoute();
     } else {
@@ -203,8 +202,6 @@ export const useRouteStore = defineStore(SetupStoreId.Route, () => {
     const menuMap = new Map(userMenus.flatMap(menu => flattenUserMenus(menu)));
 
     const routes = sortRoutesByOrder(staticAuthRoutes.flatMap(route => buildDynamicRoute(route, menuMap)));
-
-    console.log(routes);
 
     addAuthRoutes(routes);
 
