@@ -176,7 +176,8 @@ const routeMap: RouteMap = {
   "system-management_audit": "/system-management/audit",
   "system-management_menu": "/system-management/menu",
   "system-management_permission": "/system-management/permission",
-  "system-management_role": "/system-management/role"
+  "system-management_role": "/system-management/role",
+  "system-management_user": "/system-management/user"
 };
 
 /**

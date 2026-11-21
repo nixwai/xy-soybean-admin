@@ -26,20 +26,6 @@ export function setupElegantRouter() {
 
       const constantRoutes: RouteKey[] = ['login', '403', '404', '500'];
 
-      const routeMetaMap: Partial<Record<RouteKey, Partial<RouteMeta>>> = {
-        'operation-management': { icon: 'carbon:catalog', order: 3 },
-        'operation-management_asset': { order: 1 },
-        'system-management': {
-          icon: 'carbon:settings',
-          order: 2
-        },
-        'system-management_admin': { order: 1 },
-        'system-management_role': { order: 2 },
-        'system-management_permission': { order: 3 },
-        'system-management_menu': { order: 4 },
-        'system-management_audit': { order: 5 }
-      };
-
       const meta: Partial<RouteMeta> = {
         title: key,
         i18nKey: `route.${key}` as App.I18n.I18nKey
@@ -49,7 +35,7 @@ export function setupElegantRouter() {
         meta.constant = true;
       }
 
-      return { ...meta, ...routeMetaMap[key] };
+      return meta;
     }
   });
 }
