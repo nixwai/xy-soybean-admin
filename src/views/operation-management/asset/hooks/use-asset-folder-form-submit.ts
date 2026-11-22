@@ -1,5 +1,5 @@
 import { computed, ref } from 'vue';
-import { createAssetFolder, updateAssetFolder } from '@/service/api';
+import { fetchAssetFolderCreate, fetchAssetFolderUpdate } from '@/service/api';
 import { ASSET_FOLDER_OWNER_ID_PATTERN, createAssetFolderForm } from '../config/constants';
 import type { AssetFolderFormMode, AssetFolderFormModel, AssetTreeOption } from '../typings';
 
@@ -57,8 +57,8 @@ export function useAssetFolderFormSubmit(options: AssetFolderFormSubmitOptions) 
     submitting.value = true;
     try {
       const result = payload
-        ? await createAssetFolder(payload)
-        : await updateAssetFolder({ id: target.value?.key ?? '', name });
+        ? await fetchAssetFolderCreate(payload)
+        : await fetchAssetFolderUpdate({ id: target.value?.key ?? '', name });
       if (result.error) return;
 
       window.$message?.success(payload ? '文件夹已创建' : '文件夹已重命名');

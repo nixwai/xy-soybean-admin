@@ -1,5 +1,5 @@
 import { ref } from 'vue';
-import { softDeleteAssetFolder } from '@/service/api';
+import { fetchAssetFolderSoftDelete } from '@/service/api';
 import type { AssetTreeOption } from '../typings';
 
 interface AssetFolderDeleteOptions {
@@ -27,7 +27,7 @@ export function useAssetFolderDelete(options: AssetFolderDeleteOptions) {
 
     submitting.value = true;
     try {
-      const { error } = await softDeleteAssetFolder({ id: node.key });
+      const { error } = await fetchAssetFolderSoftDelete({ id: node.key });
       if (error) return;
 
       window.$message?.success('文件夹已删除');

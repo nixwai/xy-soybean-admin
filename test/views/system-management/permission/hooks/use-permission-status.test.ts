@@ -1,14 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { disablePermission, enablePermission } from '@/service/api';
+import { fetchPermissionDisable, fetchPermissionEnable } from '@/service/api';
 import { usePermissionStatus } from '@/views/system-management/permission/hooks/use-permission-status';
 
 vi.mock('@/service/api', () => ({
-  disablePermission: vi.fn(),
-  enablePermission: vi.fn()
+  fetchPermissionDisable: vi.fn(),
+  fetchPermissionEnable: vi.fn()
 }));
 
-const disableMock = vi.mocked(disablePermission);
-const enableMock = vi.mocked(enablePermission);
+const disableMock = vi.mocked(fetchPermissionDisable);
+const enableMock = vi.mocked(fetchPermissionEnable);
 const response = { data: null, error: null, response: null } as never;
 vi.stubGlobal('window', { $message: { success: vi.fn() } });
 const activePermission = { id: 'permission-1', isActive: true } as ApiManagement.Permission;

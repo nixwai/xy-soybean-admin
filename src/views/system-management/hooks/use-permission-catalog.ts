@@ -1,5 +1,5 @@
 import { computed, ref } from 'vue';
-import { fetchAssignablePermissionList, fetchPermissionList } from '@/service/api';
+import { fetchPermissionAssignableList, fetchPermissionList } from '@/service/api';
 
 /** 分组权限目录数据源，供角色授权、权限管理和菜单权限编码选择复用。 */
 export function usePermissionCatalog() {
@@ -11,7 +11,7 @@ export function usePermissionCatalog() {
   async function loadPermissionCatalog(assignable = false) {
     permissionLoading.value = true;
     try {
-      const { data, error } = await (assignable ? fetchAssignablePermissionList() : fetchPermissionList());
+      const { data, error } = await (assignable ? fetchPermissionAssignableList() : fetchPermissionList());
       if (!error && data) {
         permissionGroups.value = data.groups;
         permissionTotal.value = data.total;

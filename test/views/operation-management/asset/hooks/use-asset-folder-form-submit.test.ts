@@ -1,16 +1,16 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { createAssetFolder, updateAssetFolder } from '@/service/api';
+import { fetchAssetFolderCreate, fetchAssetFolderUpdate } from '@/service/api';
 import { createAssetFolderForm } from '@/views/operation-management/asset/config/constants';
 import { useAssetFolderFormSubmit } from '@/views/operation-management/asset/hooks/use-asset-folder-form-submit';
 import type { AssetTreeOption } from '@/views/operation-management/asset/typings';
 
 vi.mock('@/service/api', () => ({
-  createAssetFolder: vi.fn(),
-  updateAssetFolder: vi.fn()
+  fetchAssetFolderCreate: vi.fn(),
+  fetchAssetFolderUpdate: vi.fn()
 }));
 
-const createMock = vi.mocked(createAssetFolder);
-const updateMock = vi.mocked(updateAssetFolder);
+const createMock = vi.mocked(fetchAssetFolderCreate);
+const updateMock = vi.mocked(fetchAssetFolderUpdate);
 const successMock = vi.fn();
 vi.stubGlobal('window', { $message: { success: successMock } });
 

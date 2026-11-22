@@ -1,5 +1,5 @@
 import { ref } from 'vue';
-import { disablePermission, enablePermission } from '@/service/api';
+import { fetchPermissionDisable, fetchPermissionEnable } from '@/service/api';
 
 interface PermissionStatusOptions {
   onSuccess: () => void | Promise<void>;
@@ -15,7 +15,9 @@ export function usePermissionStatus(options: PermissionStatusOptions) {
 
     pendingId.value = row.id;
     try {
-      const { error } = row.isActive ? await disablePermission({ id: row.id }) : await enablePermission({ id: row.id });
+      const { error } = row.isActive
+        ? await fetchPermissionDisable({ id: row.id })
+        : await fetchPermissionEnable({ id: row.id });
       if (error) return;
 
       window.$message?.success(row.isActive ? '权限已停用' : '权限已启用');

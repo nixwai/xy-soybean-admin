@@ -1,4 +1,4 @@
-import { softDeleteRole } from '@/service/api';
+import { fetchRoleSoftDelete } from '@/service/api';
 
 interface RoleDeleteOptions {
   onSuccess: () => void | Promise<void>;
@@ -12,7 +12,7 @@ export function useRoleDelete(options: RoleDeleteOptions) {
       return;
     }
 
-    const { error } = await softDeleteRole({ id: row.id });
+    const { error } = await fetchRoleSoftDelete({ id: row.id });
     if (error) return;
 
     window.$message?.success('角色已删除');

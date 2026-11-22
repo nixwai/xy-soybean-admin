@@ -1,6 +1,6 @@
 import { request } from '../request';
 
 /** get user routes */
-export function fetchGetUserRoutes() {
+export function fetchRouteGetUserRoutes() {
   return request<Api.Route.UserRoute>({ url: '/route/getUserRoutes' });
 }

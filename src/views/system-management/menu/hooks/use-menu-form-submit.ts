@@ -1,5 +1,5 @@
 import { ref } from 'vue';
-import { updateMenu } from '@/service/api';
+import { fetchMenuUpdate } from '@/service/api';
 import { toMenuForm } from '../config/constants';
 import type { MenuFormModel } from '../typings';
 
@@ -25,7 +25,7 @@ export function useMenuFormSubmit(options: MenuFormSubmitOptions) {
     if (!target || submitting.value) return;
     submitting.value = true;
     try {
-      const result = await updateMenu({
+      const result = await fetchMenuUpdate({
         id: target.id,
         title: form.value.title.trim(),
         order: form.value.order,

@@ -1,13 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AxiosError, AxiosHeaders } from 'axios';
-import { updateUser } from '@/service/api';
+import { fetchUserUpdate } from '@/service/api';
 import { useUserStatus } from '@/views/system-management/user/hooks/use-user-status';
 
 vi.mock('@/service/api', () => ({
-  updateUser: vi.fn()
+  fetchUserUpdate: vi.fn()
 }));
 
-const updateUserMock = vi.mocked(updateUser);
+const updateUserMock = vi.mocked(fetchUserUpdate);
 const activeUser = {
   id: 'user-1',
   openId: null,
@@ -29,7 +29,7 @@ const response = {
     headers: {},
     config: { headers: new AxiosHeaders() }
   }
-} satisfies Awaited<ReturnType<typeof updateUser>>;
+} satisfies Awaited<ReturnType<typeof fetchUserUpdate>>;
 const failedResponse = {
   data: null,
   error: new AxiosError('failed'),
@@ -40,7 +40,7 @@ const failedResponse = {
     headers: {},
     config: { headers: new AxiosHeaders() }
   }
-} satisfies Awaited<ReturnType<typeof updateUser>>;
+} satisfies Awaited<ReturnType<typeof fetchUserUpdate>>;
 
 vi.stubGlobal('window', { $message: { success: vi.fn(), warning: vi.fn() } });
 

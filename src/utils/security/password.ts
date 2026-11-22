@@ -1,4 +1,4 @@
-import { fetchAdminPublicKey } from '@/service/api';
+import { fetchAuthAdminPublicKey } from '@/service/api';
 
 let publicKeyPromise: Promise<CryptoKey> | null = null;
 
@@ -12,7 +12,7 @@ function pemToDer(pem: string) {
 /** 获取并缓存后端下发的密码加密公钥。 */
 async function getPublicKey() {
   if (!publicKeyPromise) {
-    publicKeyPromise = fetchAdminPublicKey().then(async ({ data, error }) => {
+    publicKeyPromise = fetchAuthAdminPublicKey().then(async ({ data, error }) => {
       if (error || !data?.publicKey) {
         publicKeyPromise = null;
         throw new Error('获取密码加密公钥失败');

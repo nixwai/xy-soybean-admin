@@ -1,14 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { bindRolePermissions, unbindRolePermissions } from '@/service/api';
+import { fetchRolePermissionBind, fetchRolePermissionUnbind } from '@/service/api';
 import { useRolePermissionAssign } from '@/views/system-management/role/hooks/use-role-permission-assign';
 
 vi.mock('@/service/api', () => ({
-  bindRolePermissions: vi.fn(),
-  unbindRolePermissions: vi.fn()
+  fetchRolePermissionBind: vi.fn(),
+  fetchRolePermissionUnbind: vi.fn()
 }));
 
-const bindMock = vi.mocked(bindRolePermissions);
-const unbindMock = vi.mocked(unbindRolePermissions);
+const bindMock = vi.mocked(fetchRolePermissionBind);
+const unbindMock = vi.mocked(fetchRolePermissionUnbind);
 const response = { data: null, error: null, response: null } as never;
 vi.stubGlobal('window', { $message: { success: vi.fn() } });
 const role = {

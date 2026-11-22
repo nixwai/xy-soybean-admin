@@ -3,7 +3,7 @@ import { useRoute } from 'vue-router';
 import { defineStore } from 'pinia';
 import { useLoading } from '@sa/hooks';
 import { localStg } from '@/utils/storage';
-import { fetchGetUserInfo, fetchLogin, fetchLogout } from '@/service/api';
+import { fetchAdminMe, fetchAuthAdminLogin, fetchAuthLogout } from '@/service/api';
 import { $t } from '@/locales';
 import { useRouterPush } from '@/hooks/common/router';
 import { SetupStoreId } from '@/enum';
@@ -48,7 +48,7 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
   async function resetStore() {
     const refreshToken = localStg.get('refreshToken');
     if (refreshToken) {
-      fetchLogout(refreshToken).catch(() => undefined);
+      fetchAuthLogout(refreshToken).catch(() => undefined);
     }
 
     recordUserId();
@@ -110,7 +110,7 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
   async function login(userName: string, password: string, redirect = true) {
     startLoading();
 
-    const { data: loginToken, error } = await fetchLogin(userName, password);
+    const { data: loginToken, error } = await fetchAuthAdminLogin(userName, password);
 
     if (!error) {
       const pass = await loginByToken(loginToken);
@@ -157,7 +157,7 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
   }
 
   async function getUserInfo() {
-    const { data: info, error } = await fetchGetUserInfo();
+    const { data: info, error } = await fetchAdminMe();
 
     if (!error) {
       // update store

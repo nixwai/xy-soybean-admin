@@ -1,5 +1,5 @@
 import { ref } from 'vue';
-import { createRole, updateRole } from '@/service/api';
+import { fetchRoleCreate, fetchRoleUpdate } from '@/service/api';
 import { createRoleForm, toRoleForm } from '../config/constants';
 import type { RoleFormModel } from '../typings';
 
@@ -33,13 +33,13 @@ export function useRoleFormSubmit(options: RoleFormSubmitOptions) {
     submitting.value = true;
     try {
       const result = target
-        ? await updateRole({
+        ? await fetchRoleUpdate({
             id: target.id,
             name: form.value.name,
             description: form.value.description.trim() || null,
             isActive: form.value.isActive
           })
-        : await createRole({
+        : await fetchRoleCreate({
             code: form.value.code,
             name: form.value.name,
             description: form.value.description.trim() || null

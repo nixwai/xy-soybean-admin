@@ -1,6 +1,6 @@
 import { ref } from 'vue';
 import { encryptPassword } from '@/utils/security';
-import { resetAdminPassword } from '@/service/api';
+import { fetchAdminResetPassword } from '@/service/api';
 import { createAdminPasswordForm } from '../config/constants';
 import type { AdminPasswordFormModel } from '../typings';
 
@@ -27,7 +27,7 @@ export function useAdminPasswordReset(options: AdminPasswordResetOptions = {}) {
 
     submitting.value = true;
     try {
-      const { error } = await resetAdminPassword({
+      const { error } = await fetchAdminResetPassword({
         id: admin.id,
         password: await encryptPassword(form.value.password),
         currentPassword: await encryptPassword(form.value.currentPassword)

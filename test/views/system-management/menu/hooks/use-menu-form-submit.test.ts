@@ -1,12 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { updateMenu } from '@/service/api';
+import { fetchMenuUpdate } from '@/service/api';
 import { useMenuFormSubmit } from '@/views/system-management/menu/hooks/use-menu-form-submit';
 
 vi.mock('@/service/api', () => ({
-  updateMenu: vi.fn()
+  fetchMenuUpdate: vi.fn()
 }));
 
-const updateMock = vi.mocked(updateMenu);
+const updateMock = vi.mocked(fetchMenuUpdate);
 const response = { data: null, error: null, response: null } as never;
 vi.stubGlobal('window', { $message: { success: vi.fn() } });
 const menu = {

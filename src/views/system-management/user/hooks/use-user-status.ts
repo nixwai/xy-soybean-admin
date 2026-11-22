@@ -1,5 +1,5 @@
 import { ref } from 'vue';
-import { updateUser } from '@/service/api';
+import { fetchUserUpdate } from '@/service/api';
 
 interface UserStatusOptions {
   onSuccess: () => void | Promise<void>;
@@ -15,7 +15,7 @@ export function useUserStatus(options: UserStatusOptions) {
 
     pendingId.value = row.id;
     try {
-      const { error } = await updateUser({ id: row.id, isActive: !row.isActive });
+      const { error } = await fetchUserUpdate({ id: row.id, isActive: !row.isActive });
       if (error) return;
 
       window.$message?.success(row.isActive ? '用户已停用' : '用户已启用');

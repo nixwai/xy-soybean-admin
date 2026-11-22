@@ -1,6 +1,6 @@
 import { localStg } from '@/utils/storage';
 import { useAuthStore } from '@/store/modules/auth';
-import { fetchRefreshToken } from '../api';
+import { fetchAuthRefresh } from '../api';
 import type { RequestInstanceState } from './type';
 
 export function getAuthorization() {
@@ -15,7 +15,7 @@ async function handleRefreshToken() {
   const { resetStore } = useAuthStore();
 
   const rToken = localStg.get('refreshToken') || '';
-  const { error, data } = await fetchRefreshToken(rToken);
+  const { error, data } = await fetchAuthRefresh(rToken);
   if (!error) {
     localStg.set('token', data.accessToken);
     localStg.set('refreshToken', data.refreshToken);

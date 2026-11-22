@@ -1,25 +1,25 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { encryptPassword } from '@/utils/security';
-import { bindAdminRole, resetAdminPassword, softDeleteAdmin, unbindAdminRole } from '@/service/api';
+import { fetchAdminRoleBind, fetchAdminResetPassword, fetchAdminSoftDelete, fetchAdminRoleUnbind } from '@/service/api';
 import { useAdminDelete } from '@/views/system-management/admin/hooks/use-admin-delete';
 import { useAdminPasswordReset } from '@/views/system-management/admin/hooks/use-admin-password-reset';
 import { useAdminRoleAssign } from '@/views/system-management/admin/hooks/use-admin-role-assign';
 
 vi.mock('@/service/api', () => ({
-  bindAdminRole: vi.fn(),
-  resetAdminPassword: vi.fn(),
-  softDeleteAdmin: vi.fn(),
-  unbindAdminRole: vi.fn()
+  fetchAdminRoleBind: vi.fn(),
+  fetchAdminResetPassword: vi.fn(),
+  fetchAdminSoftDelete: vi.fn(),
+  fetchAdminRoleUnbind: vi.fn()
 }));
 
 vi.mock('@/utils/security', () => ({
   encryptPassword: vi.fn(async (value: string) => `encrypted:${value}`)
 }));
 
-const bindRoleMock = vi.mocked(bindAdminRole);
-const resetPasswordMock = vi.mocked(resetAdminPassword);
-const deleteMock = vi.mocked(softDeleteAdmin);
-const unbindRoleMock = vi.mocked(unbindAdminRole);
+const bindRoleMock = vi.mocked(fetchAdminRoleBind);
+const resetPasswordMock = vi.mocked(fetchAdminResetPassword);
+const deleteMock = vi.mocked(fetchAdminSoftDelete);
+const unbindRoleMock = vi.mocked(fetchAdminRoleUnbind);
 const successMock = vi.fn();
 
 vi.stubGlobal('window', { $message: { success: successMock } });

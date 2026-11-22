@@ -1,10 +1,10 @@
 import { request } from '../request';
 
-export function fetchAdminPublicKey() {
+export function fetchAuthAdminPublicKey() {
   return request<Api.Auth.AdminPublicKeyResponse>({ url: '/auth/admin/public-key' });
 }
 
-export function fetchLogin(username: string, password: string) {
+export function fetchAuthAdminLogin(username: string, password: string) {
   return request<Api.Auth.LoginToken>({
     url: '/auth/admin/login',
     method: 'post',
@@ -12,7 +12,7 @@ export function fetchLogin(username: string, password: string) {
   });
 }
 
-export function fetchRefreshToken(refreshToken: string) {
+export function fetchAuthRefresh(refreshToken: string) {
   return request<Api.Auth.LoginToken>({
     url: '/auth/refresh',
     method: 'post',
@@ -20,7 +20,7 @@ export function fetchRefreshToken(refreshToken: string) {
   });
 }
 
-export function fetchLogout(refreshToken: string) {
+export function fetchAuthLogout(refreshToken: string) {
   return request<null>({
     url: '/auth/logout',
     method: 'post',
@@ -28,6 +28,6 @@ export function fetchLogout(refreshToken: string) {
   });
 }
 
-export function fetchGetUserInfo() {
+export function fetchAdminMe() {
   return request<Api.Auth.AdminMeResponse>({ url: '/admin/me' });
 }

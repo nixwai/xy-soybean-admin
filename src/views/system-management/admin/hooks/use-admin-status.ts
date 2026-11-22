@@ -1,5 +1,5 @@
 import { ref } from 'vue';
-import { updateAdmin } from '@/service/api';
+import { fetchAdminUpdate } from '@/service/api';
 
 interface AdminStatusOptions {
   onSuccess: () => void | Promise<void>;
@@ -15,7 +15,7 @@ export function useAdminStatus(options: AdminStatusOptions) {
 
     pendingId.value = row.id;
     try {
-      const { error } = await updateAdmin({ id: row.id, isActive: !row.isActive });
+      const { error } = await fetchAdminUpdate({ id: row.id, isActive: !row.isActive });
       if (error) return;
 
       window.$message?.success(row.isActive ? '管理员已停用' : '管理员已启用');

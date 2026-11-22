@@ -24,6 +24,7 @@
 - `src/views/<module>/store`、`src/views/<module>/<page>/store`：模块或页面流程专属 Pinia store。按最小稳定作用域放置；仅当状态跨模块复用或属于全局应用状态时才上升到 `src/store`。
 - `src/components`、`src/hooks`、`src/utils`、`src/constants`：跨模块复用能力。只有稳定复用、无具体页面依赖的能力才上升到这些目录。
 - `src/service/api`：接口边界。页面不得分散硬编码请求路径，应通过 API 层维护请求函数。
+- `src/service/api` 中的接口请求函数统一命名为 `fetch` 加接口路由各段的 PascalCase；忽略首尾斜杠，连字符按单词拆分，动态路径参数不纳入函数名，例如 `/admin/reset-password` 命名为 `fetchAdminResetPassword`。
 - `src/store`、`src/locales`：分别维护全局状态和国际化文案。
 
 ## 架构规则

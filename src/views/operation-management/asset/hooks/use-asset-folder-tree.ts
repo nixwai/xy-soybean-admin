@@ -1,6 +1,6 @@
 import { computed, ref } from 'vue';
 import { PERMISSION_CODE } from '@/constants/permission';
-import { fetchAllAssetFolderTree, fetchAssetFolderTree } from '@/service/api';
+import { fetchAssetFolderTreeAll, fetchAssetFolderTree } from '@/service/api';
 import { useAuthStore } from '@/store/modules/auth';
 import { useAuth } from '@/hooks/business/auth';
 import { buildAssetTree, buildPersonalAssetTree, createOwnerAssetNode, findAssetTreeNode } from '../utils/asset-tree';
@@ -34,7 +34,7 @@ export function useAssetFolderTree() {
   async function loadTree() {
     loading.value = true;
     try {
-      const { data, error } = scopeAll.value ? await fetchAllAssetFolderTree() : await fetchAssetFolderTree();
+      const { data, error } = scopeAll.value ? await fetchAssetFolderTreeAll() : await fetchAssetFolderTree();
       if (error || !data) return;
 
       owners.value = data.owners;

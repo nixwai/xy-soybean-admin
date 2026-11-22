@@ -1,5 +1,5 @@
 import { computed, ref } from 'vue';
-import { bindAdminRole, unbindAdminRole } from '@/service/api';
+import { fetchAdminRoleBind, fetchAdminRoleUnbind } from '@/service/api';
 import type { AdminRoleAssignModel } from '../typings';
 
 interface AdminRoleAssignOptions {
@@ -59,7 +59,7 @@ export function useAdminRoleAssign(options: AdminRoleAssignOptions) {
       // 顺序提交并在首个失败处停止，避免部分成功后继续产生无效请求
       let failed = false;
       for (const roleId of bindRoleIds) {
-        const { error } = await bindAdminRole({ adminId: admin.id, roleId });
+        const { error } = await fetchAdminRoleBind({ adminId: admin.id, roleId });
         if (error) {
           failed = true;
           break;
@@ -69,7 +69,7 @@ export function useAdminRoleAssign(options: AdminRoleAssignOptions) {
 
       if (!failed) {
         for (const roleId of unbindRoleIds) {
-          const { error } = await unbindAdminRole({ adminId: admin.id, roleId });
+          const { error } = await fetchAdminRoleUnbind({ adminId: admin.id, roleId });
           if (error) {
             failed = true;
             break;

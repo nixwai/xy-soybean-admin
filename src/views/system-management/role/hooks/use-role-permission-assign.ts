@@ -1,5 +1,5 @@
 import { computed, ref } from 'vue';
-import { bindRolePermissions, unbindRolePermissions } from '@/service/api';
+import { fetchRolePermissionBind, fetchRolePermissionUnbind } from '@/service/api';
 import { createRolePermissionAssignForm } from '../config/constants';
 import type { RolePermissionAssignModel } from '../typings';
 
@@ -87,7 +87,7 @@ export function useRolePermissionAssign(options: RolePermissionAssignOptions) {
     submitting.value = true;
     try {
       if (bindPermissionIds.length) {
-        const { error } = await bindRolePermissions({
+        const { error } = await fetchRolePermissionBind({
           roleId: role.id,
           permissionIds: bindPermissionIds
         });
@@ -96,7 +96,7 @@ export function useRolePermissionAssign(options: RolePermissionAssignOptions) {
       }
 
       if (unbindPermissionIds.length) {
-        const { error } = await unbindRolePermissions({
+        const { error } = await fetchRolePermissionUnbind({
           roleId: role.id,
           permissionIds: unbindPermissionIds
         });

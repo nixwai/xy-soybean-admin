@@ -6,16 +6,16 @@ export function fetchPermissionList() {
 }
 
 /** 查询可绑定给普通角色的权限目录，按分类分组返回。 */
-export function fetchAssignablePermissionList() {
+export function fetchPermissionAssignableList() {
   return request<ApiManagement.PermissionGroupListResponse>({ url: '/permission/assignable-list' });
 }
 
 /** 启用权限。 */
-export function enablePermission(data: ApiManagement.IdRequest) {
+export function fetchPermissionEnable(data: ApiManagement.IdRequest) {
   return request<ApiManagement.Permission>({ url: '/permission/enable', method: 'post', data });
 }
 
 /** 停用权限。 */
-export function disablePermission(data: ApiManagement.IdRequest) {
+export function fetchPermissionDisable(data: ApiManagement.IdRequest) {
   return request<ApiManagement.Permission>({ url: '/permission/disable', method: 'post', data });
 }

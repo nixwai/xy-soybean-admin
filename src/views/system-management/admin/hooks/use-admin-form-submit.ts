@@ -1,6 +1,6 @@
 import { computed, ref } from 'vue';
 import { encryptPassword } from '@/utils/security';
-import { createAdmin, updateAdmin } from '@/service/api';
+import { fetchAdminCreate, fetchAdminUpdate } from '@/service/api';
 import { createAdminForm, toAdminForm } from '../config/constants';
 import type { AdminFormModel } from '../typings';
 
@@ -47,7 +47,7 @@ export function useAdminFormSubmit(options: AdminFormSubmitOptions) {
         : undefined;
 
       const result = target
-        ? await updateAdmin({
+        ? await fetchAdminUpdate({
             id: target.id,
             username: form.value.username,
             isActive: form.value.isActive,
@@ -55,7 +55,7 @@ export function useAdminFormSubmit(options: AdminFormSubmitOptions) {
             ...(form.value.password ? { password: await encryptPassword(form.value.password) } : {}),
             ...(currentPassword ? { currentPassword } : {})
           })
-        : await createAdmin({
+        : await fetchAdminCreate({
             username: form.value.username,
             password: await encryptPassword(form.value.password),
             isRoot: form.value.isRoot,

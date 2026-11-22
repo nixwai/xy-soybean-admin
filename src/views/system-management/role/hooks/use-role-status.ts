@@ -1,5 +1,5 @@
 import { ref } from 'vue';
-import { updateRole } from '@/service/api';
+import { fetchRoleUpdate } from '@/service/api';
 
 interface RoleStatusOptions {
   onSuccess: () => void | Promise<void>;
@@ -20,7 +20,7 @@ export function useRoleStatus(options: RoleStatusOptions) {
 
     pendingId.value = row.id;
     try {
-      const { error } = await updateRole({ id: row.id, isActive: !row.isActive });
+      const { error } = await fetchRoleUpdate({ id: row.id, isActive: !row.isActive });
       if (error) return;
 
       window.$message?.success(row.isActive ? '角色已停用' : '角色已启用');

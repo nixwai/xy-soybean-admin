@@ -6,6 +6,6 @@ export function fetchUserList(params: ApiManagement.UserListQuery) {
 }
 
 /** 更新微信用户资料或启用状态。 */
-export function updateUser(data: ApiManagement.UserUpdateRequest) {
+export function fetchUserUpdate(data: ApiManagement.UserUpdateRequest) {
   return request<ApiManagement.User>({ url: '/user/update', method: 'post', data });
 }

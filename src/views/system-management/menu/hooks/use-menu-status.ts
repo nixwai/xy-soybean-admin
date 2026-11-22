@@ -1,5 +1,5 @@
 import { ref } from 'vue';
-import { disableMenu, enableMenu } from '@/service/api';
+import { fetchMenuDisable, fetchMenuEnable } from '@/service/api';
 
 interface MenuStatusOptions {
   onSuccess: () => void | Promise<void>;
@@ -15,7 +15,7 @@ export function useMenuStatus(options: MenuStatusOptions) {
 
     pendingId.value = row.id;
     try {
-      const { error } = row.isActive ? await disableMenu({ id: row.id }) : await enableMenu({ id: row.id });
+      const { error } = row.isActive ? await fetchMenuDisable({ id: row.id }) : await fetchMenuEnable({ id: row.id });
       if (error) return;
 
       window.$message?.success(row.isActive ? '菜单已停用' : '菜单已启用');

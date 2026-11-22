@@ -1,6 +1,6 @@
 import { ref } from 'vue';
 import { encryptPassword } from '@/utils/security';
-import { softDeleteAdmin } from '@/service/api';
+import { fetchAdminSoftDelete } from '@/service/api';
 import { createAdminDeleteForm } from '../config/constants';
 import type { AdminDeleteModel } from '../typings';
 
@@ -27,7 +27,7 @@ export function useAdminDelete(options: AdminDeleteOptions) {
 
     submitting.value = true;
     try {
-      const { error } = await softDeleteAdmin({
+      const { error } = await fetchAdminSoftDelete({
         id: admin.id,
         currentPassword: await encryptPassword(form.value.currentPassword)
       });
