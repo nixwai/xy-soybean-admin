@@ -1,34 +1,39 @@
 import { describe, expect, it } from 'vitest';
 import { normalizeBooleanFields } from '@/service/request/normalize';
 
-describe('normalizeBooleanFields', () => {
-  it('将后端 tinyint 表达的布尔字段归一化为 boolean', () => {
-    expect(normalizeBooleanFields({ id: '1', isActive: 1, isRoot: 0 })).toEqual({
-      id: '1',
-      isActive: true,
-      isRoot: false
-    });
-  });
-
-  it('递归处理数组和嵌套对象', () => {
+describe('后端布尔字段归一化', () => {
+  it('递归转换约定字段并保留其他字段及输入不可变', () => {
     const source = {
-      items: [{ id: '1', isProtected: 1, details: { succeeded: 0 } }],
-      total: 1
+      id: '1',
+      isActive: 1,
+      isRoot: 0,
+      order: 0,
+      nested: [{ isProtected: 1, succeeded: 0, name: 'item' }]
     };
 
     expect(normalizeBooleanFields(source)).toEqual({
-      items: [{ id: '1', isProtected: true, details: { succeeded: false } }],
-      total: 1
+      id: '1',
+      isActive: true,
+      isRoot: false,
+      order: 0,
+      nested: [{ isProtected: true, succeeded: false, name: 'item' }]
+    });
+    expect(source).toEqual({
+      id: '1',
+      isActive: 1,
+      isRoot: 0,
+      order: 0,
+      nested: [{ isProtected: 1, succeeded: 0, name: 'item' }]
     });
   });
 
-  it('保留非约定字段和空值语义', () => {
-    expect(normalizeBooleanFields({ isSystem: 1, order: 0, deletedAt: null, name: 'x' })).toEqual({
-      isSystem: true,
-      order: 0,
-      deletedAt: null,
-      name: 'x'
-    });
+  it('按 JavaScript 布尔语义处理字段并保留空值和原始值', () => {
     expect(normalizeBooleanFields(null)).toBeNull();
+    expect(normalizeBooleanFields(undefined)).toBeUndefined();
+    expect(normalizeBooleanFields({ isActive: '', isRoot: '0', count: 0 })).toEqual({
+      isActive: false,
+      isRoot: true,
+      count: 0
+    });
   });
 });
