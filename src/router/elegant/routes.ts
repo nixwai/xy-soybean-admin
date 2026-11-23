@@ -82,8 +82,8 @@ export const generatedRoutes: GeneratedRoute[] = [
     meta: {
       title: 'operation-management',
       i18nKey: 'route.operation-management',
-      icon: 'carbon:catalog',
-      order: 3
+      icon: 'mdi:notebook-outline',
+      order: 2
     },
     children: [
       {
@@ -93,7 +93,8 @@ export const generatedRoutes: GeneratedRoute[] = [
         meta: {
           title: 'operation-management_asset',
           i18nKey: 'route.operation-management_asset',
-          order: 1
+          order: 1,
+          icon: 'carbon:folders'
         }
       }
     ]
@@ -106,7 +107,7 @@ export const generatedRoutes: GeneratedRoute[] = [
       title: 'system-management',
       i18nKey: 'route.system-management',
       icon: 'carbon:settings',
-      order: 2
+      order: 3
     },
     children: [
       {
@@ -116,7 +117,8 @@ export const generatedRoutes: GeneratedRoute[] = [
         meta: {
           title: 'system-management_admin',
           i18nKey: 'route.system-management_admin',
-          order: 1
+          order: 2,
+          icon: 'carbon:id-management'
         }
       },
       {
@@ -126,7 +128,8 @@ export const generatedRoutes: GeneratedRoute[] = [
         meta: {
           title: 'system-management_audit',
           i18nKey: 'route.system-management_audit',
-          order: 5
+          order: 6,
+          icon: 'carbon:book'
         }
       },
       {
@@ -136,7 +139,8 @@ export const generatedRoutes: GeneratedRoute[] = [
         meta: {
           title: 'system-management_menu',
           i18nKey: 'route.system-management_menu',
-          order: 4
+          order: 4,
+          icon: 'carbon:menu'
         }
       },
       {
@@ -146,7 +150,8 @@ export const generatedRoutes: GeneratedRoute[] = [
         meta: {
           title: 'system-management_permission',
           i18nKey: 'route.system-management_permission',
-          order: 3
+          order: 5,
+          icon: 'carbon:ibm-cloud-essential-security-and-observability-services'
         }
       },
       {
@@ -156,7 +161,8 @@ export const generatedRoutes: GeneratedRoute[] = [
         meta: {
           title: 'system-management_role',
           i18nKey: 'route.system-management_role',
-          order: 2
+          order: 3,
+          icon: 'carbon:ibm-cloud-app-id'
         }
       },
       {
@@ -166,7 +172,8 @@ export const generatedRoutes: GeneratedRoute[] = [
         meta: {
           title: 'system-management_user',
           i18nKey: 'route.system-management_user',
-          order: 2
+          order: 1,
+          icon: 'carbon:user'
         }
       }
     ]
