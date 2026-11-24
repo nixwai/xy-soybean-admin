@@ -4,6 +4,7 @@ import { NButton, NCard, NDropdown, NEmpty, NSpace, NSpin, NSwitch, NTree } from
 import { useAssetFolderContextMenu } from '../hooks/use-asset-folder-context-menu';
 import { useAssetFolderTree } from '../hooks/use-asset-folder-tree';
 import type { AssetTreeOption } from '../typings';
+import AssetSearchForm from './asset-search-form.vue';
 import FolderDeleteModal from './folder-delete-modal.vue';
 import FolderFormModal from './folder-form-modal.vue';
 
@@ -29,7 +30,8 @@ const {
   scopeAll,
   selectedKeys,
   selectedNode,
-  treeData
+  treeData,
+  query
 } = useAssetFolderTree();
 const { closeContextMenu, contextMenu, contextOptions, contextTarget, nodeProps } = useAssetFolderContextMenu();
 
@@ -95,6 +97,7 @@ onMounted(() => void loadTree());
       </NSpace>
     </template>
     <NSpin :show="loading">
+      <AssetSearchForm v-model:query="query" style="margin-bottom: 10px" />
       <NTree
         v-if="treeData.length"
         v-model:selected-keys="selectedKeys"

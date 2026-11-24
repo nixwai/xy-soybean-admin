@@ -12,9 +12,11 @@ import AdminDeleteModal from './components/admin-delete-modal.vue';
 import AdminFormModal from './components/admin-form-modal.vue';
 import AdminPasswordModal from './components/admin-password-modal.vue';
 import AdminRoleModal from './components/admin-role-modal.vue';
+import AdminSearchForm from './components/admin-search-form.vue';
 
 const authStore = useAuthStore();
-const { loading, items, total, page, pageSize, load, changePage, changePageSize } = useAdminQuery();
+const { loading, items, total, page, pageSize, query, load, search, reset, changePage, changePageSize } =
+  useAdminQuery();
 const { roleLoading, roles, roleNameMap, loadRoles } = useRoleOptions();
 const { pendingId, toggle: toggleStatus } = useAdminStatus({ onSuccess: load });
 
@@ -56,26 +58,32 @@ onMounted(refresh);
 </script>
 
 <template>
-  <NCard title="管理员管理" :bordered="false" class="card-wrapper">
-    <template #header-extra>
-      <NSpace :size="8">
-        <NButton size="small" :loading="loading" @click="refresh">刷新</NButton>
-        <NButton size="small" type="primary" @click="formModalRef?.openCreate()">新增管理员</NButton>
-      </NSpace>
-    </template>
-    <NDataTable
-      remote
-      size="small"
-      :columns="columns"
-      :data="items"
-      :loading="loading"
-      :pagination="pagination"
-      :scroll-x="1180"
-      :row-key="row => row.id"
-    />
-    <AdminFormModal ref="formModalRef" @success="load" />
-    <AdminRoleModal ref="roleModalRef" :roles="roles" :roles-loading="roleLoading" @success="load" />
-    <AdminPasswordModal ref="passwordModalRef" @success="load" />
-    <AdminDeleteModal ref="deleteModalRef" @success="load" />
-  </NCard>
+  <NSpace vertical :size="16">
+    <NCard :bordered="false" class="card-wrapper">
+      <AdminSearchForm v-model:query="query" :loading="loading" @search="search" @reset="reset" />
+    </NCard>
+
+    <NCard title="管理员管理" :bordered="false" class="card-wrapper">
+      <template #header-extra>
+        <NSpace :size="8">
+          <NButton size="small" :loading="loading" @click="refresh">刷新</NButton>
+          <NButton size="small" type="primary" @click="formModalRef?.openCreate()">新增管理员</NButton>
+        </NSpace>
+      </template>
+      <NDataTable
+        remote
+        size="small"
+        :columns="columns"
+        :data="items"
+        :loading="loading"
+        :pagination="pagination"
+        :scroll-x="1180"
+        :row-key="row => row.id"
+      />
+      <AdminFormModal ref="formModalRef" @success="load" />
+      <AdminRoleModal ref="roleModalRef" :roles="roles" :roles-loading="roleLoading" @success="load" />
+      <AdminPasswordModal ref="passwordModalRef" @success="load" />
+      <AdminDeleteModal ref="deleteModalRef" @success="load" />
+    </NCard>
+  </NSpace>
 </template>

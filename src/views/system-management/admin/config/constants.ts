@@ -1,7 +1,32 @@
-import type { AdminDeleteModel, AdminFormModel, AdminPasswordFormModel, AdminRoleAssignModel } from '../typings';
+import type {
+  AdminDeleteModel,
+  AdminFormModel,
+  AdminPasswordFormModel,
+  AdminQueryModel,
+  AdminRoleAssignModel,
+  AdminStatusFilter,
+  AdminTypeFilter
+} from '../typings';
 
 /** 管理员列表的默认分页大小。 */
 export const ADMIN_PAGE_SIZE = 20;
+
+/** 管理员列表状态筛选选项。 */
+export const ADMIN_STATUS_OPTIONS: Array<{ label: string; value: AdminStatusFilter }> = [
+  { label: '已启用', value: 'active' },
+  { label: '已停用', value: 'inactive' }
+];
+
+/** 管理员列表类型筛选选项。 */
+export const ADMIN_TYPE_OPTIONS: Array<{ label: string; value: AdminTypeFilter }> = [
+  { label: '根管理员', value: 'root' },
+  { label: '普通管理员', value: 'regular' }
+];
+
+/** 创建管理员列表查询条件默认值。 */
+export function createDefaultAdminQuery(): AdminQueryModel {
+  return { id: '', username: '', statusFilter: null, typeFilter: null };
+}
 
 /** 后端用户名规则：字母、数字、点、下划线和连字符，长度 3-64。 */
 export const ADMIN_USERNAME_PATTERN = /^[A-Za-z0-9._-]{3,64}$/;

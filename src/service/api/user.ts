@@ -1,6 +1,6 @@
 import { request } from '../request';
 
-/** 按关键词和状态分页查询微信用户。 */
+/** 按独立字段和状态分页查询微信用户。 */
 export function fetchUserList(params: ApiManagement.UserListQuery) {
   return request<ApiManagement.PageResponse<ApiManagement.User>>({ url: '/user/list', params });
 }

@@ -29,7 +29,7 @@ export function useRolePermissionAssign(options: RolePermissionAssignOptions) {
   /** 将批量绑定成功的关系写回本地快照，使失败后重试只提交未完成的差异。 */
   function markPermissionsBound(permissionIds: string[]) {
     const role = target.value;
-    if (!role || permissionIds.length === 0) return;
+    if (!role || !permissionIds.length) return;
     const boundIds = new Set(role.permissionIds);
     const nextPermissionIds = [...role.permissionIds];
     for (const permissionId of permissionIds) {
@@ -48,7 +48,7 @@ export function useRolePermissionAssign(options: RolePermissionAssignOptions) {
   /** 将批量解绑成功的关系写回本地快照。 */
   function markPermissionsUnbound(permissionIds: string[]) {
     const role = target.value;
-    if (!role || permissionIds.length === 0) return;
+    if (!role || !permissionIds.length) return;
     const unboundIds = new Set(permissionIds);
     target.value = {
       ...role,

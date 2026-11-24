@@ -26,3 +26,21 @@ export interface AdminRoleAssignModel {
 export interface AdminDeleteModel {
   currentPassword: string;
 }
+
+/** 管理员列表查询表单模型。 */
+export interface AdminQueryModel {
+  /** 管理员 ID。 */
+  id: string;
+  /** 登录用户名。 */
+  username: string;
+  /** 管理员启停状态。 */
+  statusFilter: AdminStatusFilter | null;
+  /** 管理员类型。 */
+  typeFilter: AdminTypeFilter | null;
+}
+
+/** 管理员状态筛选值。 */
+export type AdminStatusFilter = 'active' | 'inactive';
+
+/** 管理员类型筛选值。 */
+export type AdminTypeFilter = 'root' | 'regular';

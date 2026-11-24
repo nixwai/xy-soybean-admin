@@ -31,26 +31,38 @@ const query = defineModel<UserQueryModel>('query', {
 <template>
   <NForm :model="query" label-placement="left" :show-feedback="false">
     <NGrid :x-gap="12" :y-gap="12" responsive="screen" item-responsive>
-      <NGi span="24 s:12 m:8">
-        <NFormItem label="关键词">
-          <NInput
-            v-model:value="query.keyword"
-            clearable
-            placeholder="用户 ID、微信标识或昵称"
-            @keyup.enter="emit('search')"
-          />
+      <NGi span="24 s:12 m:6">
+        <NFormItem label="用户 ID">
+          <NInput v-model:value="query.id" clearable placeholder="用户 ID" @keyup.enter="emit('search')" />
         </NFormItem>
       </NGi>
-      <NGi span="24 s:12 m:8">
+      <NGi span="24 s:12 m:6">
+        <NFormItem label="昵称">
+          <NInput v-model:value="query.nickname" clearable placeholder="用户昵称" @keyup.enter="emit('search')" />
+        </NFormItem>
+      </NGi>
+      <NGi span="24 s:12 m:6">
+        <NFormItem label="openId">
+          <NInput v-model:value="query.openId" clearable placeholder="微信 openId" @keyup.enter="emit('search')" />
+        </NFormItem>
+      </NGi>
+      <NGi span="24 s:12 m:6">
+        <NFormItem label="unionId">
+          <NInput v-model:value="query.unionId" clearable placeholder="微信 unionId" @keyup.enter="emit('search')" />
+        </NFormItem>
+      </NGi>
+      <NGi span="24 s:12 m:6">
         <NFormItem label="状态">
-          <NSelect v-model:value="query.statusFilter" :options="USER_STATUS_OPTIONS" />
+          <NSelect v-model:value="query.statusFilter" :options="USER_STATUS_OPTIONS" clearable placeholder="全部状态" />
         </NFormItem>
       </NGi>
-      <NGi span="24 s:12 m:8">
+      <NGi span="24">
         <NFormItem>
-          <NSpace justify="end" class="w-full">
+          <NSpace justify="start" class="w-full">
+            <NButton type="primary" :loading="props.loading" @click="emit('search')" @keyup.enter="emit('search')">
+              查询
+            </NButton>
             <NButton :disabled="props.loading" @click="emit('reset')">重置</NButton>
-            <NButton type="primary" :loading="props.loading" @click="emit('search')">查询</NButton>
           </NSpace>
         </NFormItem>
       </NGi>

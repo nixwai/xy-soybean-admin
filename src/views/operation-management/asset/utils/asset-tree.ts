@@ -1,4 +1,4 @@
-import type { AssetTreeOption } from '../typings';
+import type { AssetTreeOption, AssetTreeQueryModel } from '../typings';
 
 /** 账号根节点标识前缀，避免与文件夹主键冲突。 */
 const OWNER_KEY_PREFIX = 'owner:';
@@ -45,4 +45,30 @@ export function findAssetTreeNode(nodes: AssetTreeOption[], key?: string): Asset
     if (matched) return matched;
   }
   return null;
+}
+
+/** 按文件夹名称或账号名称关键词过滤素材树，并保留命中节点的祖先路径。 */
+export function filterAssetTree(nodes: AssetTreeOption[], query: AssetTreeQueryModel): AssetTreeOption[] {
+  const keyword = query.keyword.toLocaleLowerCase();
+  if (!keyword) return nodes.map(node => cloneAssetTreeNode(node));
+
+  return nodes.flatMap(node => {
+    if (node.label.toLocaleLowerCase().includes(keyword)) return [cloneAssetTreeNode(node)];
+    const children = filterAssetTreeNodes(node.children ?? [], keyword);
+    if (!children.length) return [];
+    return [{ ...node, children }];
+  });
+}
+
+function filterAssetTreeNodes(nodes: AssetTreeOption[], keyword: string): AssetTreeOption[] {
+  return nodes.flatMap(node => {
+    if (node.label.toLocaleLowerCase().includes(keyword)) return [cloneAssetTreeNode(node)];
+    const children = filterAssetTreeNodes(node.children ?? [], keyword);
+    if (!children.length) return [];
+    return [{ ...node, children }];
+  });
+}
+
+function cloneAssetTreeNode(node: AssetTreeOption): AssetTreeOption {
+  return { ...node, ...(node.children ? { children: node.children.map(child => cloneAssetTreeNode(child)) } : {}) };
 }

@@ -32,3 +32,12 @@ declare namespace ApiManagement {
     roleId: string;
   }
 }
+
+declare namespace ApiManagement {
+  interface AdminListQuery extends PageQuery {
+    id?: string;
+    username?: string;
+    isActive?: boolean;
+    isRoot?: boolean;
+  }
+}

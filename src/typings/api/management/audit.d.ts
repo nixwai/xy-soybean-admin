@@ -1,4 +1,17 @@
 declare namespace ApiManagement {
+  interface AuditOption {
+    label: string;
+    value: string;
+    disabled?: boolean;
+    [key: string]: unknown;
+  }
+
+  interface AuditOptionsResponse {
+    actions: AuditOption[];
+    resources: AuditOption[];
+    results: AuditOption[];
+  }
+
   interface AuditLog {
     id: string;
     actorAdminId: string | null;
@@ -15,6 +28,13 @@ declare namespace ApiManagement {
   interface AuditQuery {
     cursor?: string;
     limit: number;
+    actorAdminId?: string;
+    targetId?: string;
+    action?: string | null;
+    resourceType?: string | null;
+    succeeded?: boolean;
+    createdFrom?: string;
+    createdTo?: string;
   }
   interface AuditListResponse {
     items: AuditLog[];

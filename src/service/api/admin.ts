@@ -1,7 +1,7 @@
 import { request } from '../request';
 
 /** 分页查询未软删除的管理员列表。 */
-export function fetchAdminList(params: ApiManagement.PageQuery) {
+export function fetchAdminList(params: ApiManagement.AdminListQuery) {
   return request<ApiManagement.PageResponse<ApiManagement.Admin>>({ url: '/admin/list', params });
 }
 

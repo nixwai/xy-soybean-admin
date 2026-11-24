@@ -62,6 +62,7 @@ function renderRoles(row: ApiManagement.Admin, roleNameMap: Map<string, string>)
 /** 构建管理员列表列，将行级动作从页面入口注入。 */
 export function createAdminColumns(handlers: AdminColumnHandlers): DataTableColumns<ApiManagement.Admin> {
   return [
+    { title: 'ID', key: 'id', minWidth: 80 },
     { title: '用户名', key: 'username', minWidth: 140, ellipsis: { tooltip: true } },
     {
       title: '管理员类型',
