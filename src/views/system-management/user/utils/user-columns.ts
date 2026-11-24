@@ -39,7 +39,6 @@ function renderOpenId(row: ApiManagement.User): VNode {
 export function createUserColumns(handlers: UserColumnHandlers): DataTableColumns<ApiManagement.User> {
   const columns: DataTableColumns<ApiManagement.User> = [
     { title: '用户 ID', key: 'id', width: 120, ellipsis: { tooltip: true } },
-    { title: '微信标识', key: 'openId', minWidth: 180, render: renderOpenId },
     {
       title: '昵称',
       key: 'nickname',
@@ -47,6 +46,7 @@ export function createUserColumns(handlers: UserColumnHandlers): DataTableColumn
       ellipsis: { tooltip: true },
       render: row => row.nickname || '-'
     },
+    { title: 'openId', key: 'openId', minWidth: 180, render: renderOpenId },
     {
       title: '状态',
       key: 'isActive',

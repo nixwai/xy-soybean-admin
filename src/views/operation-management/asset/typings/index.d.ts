@@ -24,3 +24,9 @@ export interface AssetFolderFormModel {
   /** 全局新增时的目标拥有者 ID。 */
   ownerId: string;
 }
+
+/** 素材文件夹树查询表单模型。 */
+export interface AssetTreeQueryModel {
+  /** 匹配文件夹名称或归属账号名称的关键词。 */
+  keyword: string;
+}

@@ -14,7 +14,7 @@ export function createAuditColumns(): DataTableColumns<ApiManagement.AuditLog> {
       render: row => formatDateTime(row.createdAt)
     },
     {
-      title: '操作者',
+      title: '操作者ID',
       key: 'actorAdminId',
       width: 110,
       render: row => row.actorAdminId ?? h('span', { class: 'text-#999' }, '系统')

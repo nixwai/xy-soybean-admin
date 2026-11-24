@@ -1,7 +1,30 @@
-import type { RoleFormModel, RolePermissionAssignModel } from '../typings';
+import type {
+  RoleFormModel,
+  RolePermissionAssignModel,
+  RoleQueryModel,
+  RoleStatusFilter,
+  RoleTypeFilter
+} from '../typings';
 
 /** 角色列表的默认分页大小。 */
 export const ROLE_PAGE_SIZE = 20;
+
+/** 角色列表状态筛选选项。 */
+export const ROLE_STATUS_OPTIONS: Array<{ label: string; value: RoleStatusFilter }> = [
+  { label: '已启用', value: 'active' },
+  { label: '已停用', value: 'inactive' }
+];
+
+/** 角色列表类型筛选选项。 */
+export const ROLE_TYPE_OPTIONS: Array<{ label: string; value: RoleTypeFilter }> = [
+  { label: '系统角色', value: 'system' },
+  { label: '自定义角色', value: 'custom' }
+];
+
+/** 创建角色列表查询条件默认值。 */
+export function createDefaultRoleQuery(): RoleQueryModel {
+  return { code: '', name: '', statusFilter: null, typeFilter: null };
+}
 
 /** 后端角色编码规则：以小写字母开头，允许小写字母、数字、冒号、下划线和连字符。 */
 export const ROLE_CODE_PATTERN = /^[a-z][a-z0-9:_-]*$/;

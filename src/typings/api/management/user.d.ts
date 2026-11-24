@@ -12,7 +12,10 @@ declare namespace ApiManagement {
   }
 
   interface UserListQuery extends PageQuery {
-    keyword?: string;
+    id?: string;
+    openId?: string;
+    unionId?: string;
+    nickname?: string;
     isActive?: boolean;
   }
 

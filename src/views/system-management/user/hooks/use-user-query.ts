@@ -1,17 +1,18 @@
-import { reactive, ref, toRef } from 'vue';
+import { reactive, ref } from 'vue';
 import { fetchUserList } from '@/service/api';
 import { createDefaultUserQuery, USER_PAGE_SIZE } from '../config/constants';
 import type { UserQueryModel } from '../typings';
 
-/** 将页面筛选模型转换为后端查询参数，空关键词和全部状态不发送。 */
-function buildUserListParams(page: number, pageSize: number, query: UserQueryModel) {
-  const normalizedKeyword = query.keyword.trim();
-
+/** 将页面筛选模型转换为后端查询参数，可选筛选字段直接传递。 */
+export function buildUserListParams(page: number, pageSize: number, query: UserQueryModel) {
   return {
     page,
     pageSize,
-    ...(normalizedKeyword ? { keyword: normalizedKeyword } : {}),
-    ...(query.statusFilter === 'all' ? {} : { isActive: query.statusFilter === 'active' })
+    id: query.id,
+    openId: query.openId,
+    unionId: query.unionId,
+    nickname: query.nickname,
+    isActive: query.statusFilter === null ? undefined : query.statusFilter === 'active'
   } satisfies ApiManagement.UserListQuery;
 }
 
@@ -23,8 +24,6 @@ export function useUserQuery() {
   const page = ref(1);
   const pageSize = ref(USER_PAGE_SIZE);
   const query = reactive(createDefaultUserQuery());
-  const keyword = toRef(query, 'keyword');
-  const statusFilter = toRef(query, 'statusFilter');
 
   /** 按当前筛选和分页条件拉取用户列表。 */
   async function load() {
@@ -74,8 +73,6 @@ export function useUserQuery() {
     page,
     pageSize,
     query,
-    keyword,
-    statusFilter,
     load,
     search,
     reset,

@@ -1,7 +1,7 @@
 import { request } from '../request';
 
 /** 分页查询未软删除的角色列表。 */
-export function fetchRoleList(params: ApiManagement.PageQuery) {
+export function fetchRoleList(params: ApiManagement.RoleListQuery) {
   return request<ApiManagement.PageResponse<ApiManagement.Role>>({ url: '/role/list', params });
 }
 

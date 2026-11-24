@@ -10,8 +10,10 @@ import { useRoleQuery } from './hooks/use-role-query';
 import { useRoleStatus } from './hooks/use-role-status';
 import RoleFormModal from './components/role-form-modal.vue';
 import RolePermissionModal from './components/role-permission-modal.vue';
+import RoleSearchForm from './components/role-search-form.vue';
 
-const { loading, items, total, page, pageSize, load, changePage, changePageSize } = useRoleQuery();
+const { loading, items, total, page, pageSize, query, load, search, reset, changePage, changePageSize } =
+  useRoleQuery();
 const { permissionLoading, permissionGroups, loadPermissionCatalog } = usePermissionCatalog();
 const { pendingId, toggle: toggleStatus } = useRoleStatus({ onSuccess: load });
 const { remove: deleteRole } = useRoleDelete({ onSuccess: load });
@@ -53,29 +55,35 @@ onMounted(refresh);
 </script>
 
 <template>
-  <NCard title="角色管理" :bordered="false" class="card-wrapper">
-    <template #header-extra>
-      <NSpace :size="8">
-        <NButton size="small" :loading="loading" @click="refresh">刷新</NButton>
-        <NButton size="small" type="primary" @click="formModalRef?.openCreate()">新增角色</NButton>
-      </NSpace>
-    </template>
-    <NDataTable
-      remote
-      size="small"
-      :columns="columns"
-      :data="items"
-      :loading="loading"
-      :pagination="pagination"
-      :scroll-x="1120"
-      :row-key="row => row.id"
-    />
-    <RoleFormModal ref="formModalRef" @success="load" />
-    <RolePermissionModal
-      ref="permissionModalRef"
-      :groups="permissionGroups"
-      :loading="permissionLoading"
-      @success="load"
-    />
-  </NCard>
+  <NSpace vertical :size="16">
+    <NCard :bordered="false" class="card-wrapper">
+      <RoleSearchForm v-model:query="query" :loading="loading" @search="search" @reset="reset" />
+    </NCard>
+
+    <NCard title="角色管理" :bordered="false" class="card-wrapper">
+      <template #header-extra>
+        <NSpace :size="8">
+          <NButton size="small" :loading="loading" @click="refresh">刷新</NButton>
+          <NButton size="small" type="primary" @click="formModalRef?.openCreate()">新增角色</NButton>
+        </NSpace>
+      </template>
+      <NDataTable
+        remote
+        size="small"
+        :columns="columns"
+        :data="items"
+        :loading="loading"
+        :pagination="pagination"
+        :scroll-x="1120"
+        :row-key="row => row.id"
+      />
+      <RoleFormModal ref="formModalRef" @success="load" />
+      <RolePermissionModal
+        ref="permissionModalRef"
+        :groups="permissionGroups"
+        :loading="permissionLoading"
+        @success="load"
+      />
+    </NCard>
+  </NSpace>
 </template>

@@ -26,3 +26,12 @@ declare namespace ApiManagement {
     permissionIds: string[];
   }
 }
+
+declare namespace ApiManagement {
+  interface RoleListQuery extends PageQuery {
+    code?: string;
+    name?: string;
+    isActive?: boolean;
+    isSystem?: boolean;
+  }
+}

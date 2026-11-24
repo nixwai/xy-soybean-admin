@@ -1,9 +1,16 @@
-import { computed, ref } from 'vue';
+import { computed, reactive, ref } from 'vue';
 import { PERMISSION_CODE } from '@/constants/permission';
 import { fetchAssetFolderTreeAll, fetchAssetFolderTree } from '@/service/api';
 import { useAuthStore } from '@/store/modules/auth';
 import { useAuth } from '@/hooks/business/auth';
-import { buildAssetTree, buildPersonalAssetTree, createOwnerAssetNode, findAssetTreeNode } from '../utils/asset-tree';
+import {
+  buildAssetTree,
+  buildPersonalAssetTree,
+  createOwnerAssetNode,
+  filterAssetTree,
+  findAssetTreeNode
+} from '../utils/asset-tree';
+import type { AssetTreeQueryModel } from '../typings';
 
 /** 管理素材文件夹树的数据源、查看范围与节点选中。 */
 export function useAssetFolderTree() {
@@ -16,11 +23,13 @@ export function useAssetFolderTree() {
   const selectedKeys = ref<string[]>([]);
   const expandedKeys = ref<string[]>([]);
   const owners = ref<ApiManagement.AssetFolderOwnerTree[]>([]);
+  const query = reactive<AssetTreeQueryModel>({ keyword: '' });
   /** 全部视图保留账号根节点，个人视图仅展示当前账号的顶层文件夹。 */
-  const treeData = computed(() =>
+  const completeTreeData = computed(() =>
     scopeAll.value ? buildAssetTree(owners.value) : buildPersonalAssetTree(owners.value)
   );
-  const selectedNode = computed(() => findAssetTreeNode(treeData.value, selectedKeys.value[0]));
+  const treeData = computed(() => filterAssetTree(completeTreeData.value, query));
+  const selectedNode = computed(() => findAssetTreeNode(completeTreeData.value, selectedKeys.value[0]));
   /** 个人视图顶层新建目标：优先取个人树根账号，取数完成前以当前登录账号兜底，展示名按后端约定回退为 ID。 */
   const personalOwnerNode = computed(() =>
     createOwnerAssetNode(
@@ -39,7 +48,7 @@ export function useAssetFolderTree() {
 
       owners.value = data.owners;
       expandedKeys.value = [];
-      if (selectedKeys.value.length && !findAssetTreeNode(treeData.value, selectedKeys.value[0])) {
+      if (selectedKeys.value.length && !findAssetTreeNode(completeTreeData.value, selectedKeys.value[0])) {
         selectedKeys.value = [];
       }
     } finally {
@@ -57,6 +66,7 @@ export function useAssetFolderTree() {
 
   return {
     canCreateTopLevel,
+    query,
     canViewAll,
     changeScope,
     expandedKeys,
