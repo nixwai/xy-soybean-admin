@@ -30,3 +30,13 @@ export interface AssetTreeQueryModel {
   /** 匹配文件夹名称或归属账号名称的关键词。 */
   keyword: string;
 }
+
+/** 素材图片列表分页状态。 */
+export interface AssetImagePaginationState {
+  /** 当前页码。 */
+  page: number;
+  /** 每页数量。 */
+  pageSize: number;
+  /** 总数量。 */
+  total: number;
+}

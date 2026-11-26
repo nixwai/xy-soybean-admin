@@ -43,4 +43,37 @@ declare namespace ApiManagement {
     id: string;
     name: string;
   }
+  /** 素材图片公开信息。 */
+  interface AssetImage {
+    id: string;
+    folderId: string;
+    ownerId: string;
+    creatorId: string;
+    originalName: string;
+    url: string;
+    mimeType: string;
+    size: number;
+    width: number;
+    height: number;
+    createdAt: string;
+    updatedAt: string;
+  }
+  /** 素材图片分页查询参数。 */
+  interface AssetImageListQuery extends PageQuery {
+    folderId: string;
+  }
+  /** 素材图片分页响应。 */
+  interface AssetImagePageResponse extends PageResponse<AssetImage> {}
+  /** 单个上传失败项。 */
+  interface AssetImageUploadFailure {
+    filename: string;
+    reason: string;
+  }
+  /** 素材图片批量上传响应。 */
+  interface AssetImageUploadResponse {
+    success: AssetImage[];
+    failed: AssetImageUploadFailure[];
+    totalCount: number;
+    successCount: number;
+  }
 }

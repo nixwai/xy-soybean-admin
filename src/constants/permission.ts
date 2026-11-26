@@ -15,7 +15,11 @@ export const PERMISSION_CODE = {
   /** 更新素材文件夹。 */
   ASSET_FOLDER_UPDATE: 'asset.folder.update',
   /** 删除素材文件夹。 */
-  ASSET_FOLDER_DELETE: 'asset.folder.delete'
+  ASSET_FOLDER_DELETE: 'asset.folder.delete',
+  /** 查看素材图片。 */
+  ASSET_IMAGE_READ: 'asset.image.read',
+  /** 上传素材图片。 */
+  ASSET_IMAGE_UPLOAD: 'asset.image.upload'
 } as const;
 
 /** 后端动态权限编码。 */
