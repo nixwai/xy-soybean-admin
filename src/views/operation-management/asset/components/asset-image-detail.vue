@@ -49,6 +49,9 @@ defineProps<{
 }
 
 .asset-image-detail__preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   overflow: hidden;
   aspect-ratio: 1.28;
   padding: 12px;
@@ -60,6 +63,14 @@ defineProps<{
   display: block;
   width: 100%;
   height: 100%;
+}
+
+.asset-image-detail__preview :deep(.n-image img) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
 }
 
 .asset-image-detail__table {

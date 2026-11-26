@@ -80,7 +80,7 @@ watch(
         @click="handleSelect(item)"
       >
         <div class="asset-image-item__thumb">
-          <NImage :src="item.url" :alt="item.originalName" object-fit="cover" width="100%" height="100%" />
+          <NImage :src="item.url" :alt="item.originalName" object-fit="contain" width="100%" height="100%" />
         </div>
         <div class="asset-image-item__body">
           <div class="truncate text-13px font-600">
@@ -135,8 +135,12 @@ watch(
 }
 
 .asset-image-item__thumb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   overflow: hidden;
   aspect-ratio: 1.4;
+  padding: 8px;
   background: var(--n-color-embedded);
 }
 
@@ -144,6 +148,14 @@ watch(
   display: block;
   width: 100%;
   height: 100%;
+}
+
+.asset-image-item__thumb :deep(.n-image img) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
 }
 
 .asset-image-item__body {
