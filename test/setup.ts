@@ -1,3 +1,8 @@
+import { createPinia, setActivePinia } from 'pinia';
+
+// 页面级 Pinia store 需要在无组件实例的场景下可用，测试进程统一激活一个实例。
+setActivePinia(createPinia());
+
 class MemoryStorage implements Storage {
   private readonly values = new Map<string, string>();
 

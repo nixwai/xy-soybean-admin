@@ -1,10 +1,13 @@
 import { ref } from 'vue';
-import { fetchAssetImageList } from '@/service/api';
-import type { AssetTreeOption } from '../typings';
+import { fetchAssetImageList, fetchAssetImageSearch } from '@/service/api';
+import type { AssetImageQueryContext } from '../typings';
+
+/** 图片列表查询请求。 */
+type AssetImageRequest = () => Promise<{ data: ApiManagement.AssetImagePageResponse | null }>;
 
 const DEFAULT_PAGE_SIZE = 6;
 
-/** 管理当前文件夹直属图片的分页查询状态。 */
+/** 管理素材图片列表的分页查询状态，关键词非空时改用范围搜索。 */
 export function useAssetImageQuery() {
   const loading = ref(false);
   const items = ref<ApiManagement.AssetImage[]>([]);
@@ -14,25 +17,13 @@ export function useAssetImageQuery() {
   const selectedId = ref<string | null>(null);
   let requestToken = 0;
 
-  /** 查询当前文件夹直属图片，并丢弃已过期请求结果。 */
-  async function load(node: AssetTreeOption | null, targetPage = page.value): Promise<boolean> {
-    if (!node || node.nodeType !== 'folder') {
-      requestToken += 1;
-      items.value = [];
-      total.value = 0;
-      selectedId.value = null;
-      return true;
-    }
-
+  /** 发起查询并统一处理过期响应、分页状态和异常。 */
+  async function runFetch(fetcher: AssetImageRequest, targetPage: number): Promise<boolean> {
     const token = ++requestToken;
     loading.value = true;
     page.value = targetPage;
     try {
-      const { data } = await fetchAssetImageList({
-        folderId: node.key,
-        page: page.value,
-        pageSize: pageSize.value
-      });
+      const { data } = await fetcher();
       if (token !== requestToken) return true;
       if (!data) return false;
       items.value = data.items;
@@ -51,9 +42,42 @@ export function useAssetImageQuery() {
     }
   }
 
-  /** 切换页码。 */
-  async function changePage(node: AssetTreeOption | null, value: number) {
-    return load(node, value);
+  /** 按查询上下文读取图片：关键词非空走范围搜索，否则只读取当前文件夹直属图片。 */
+  async function load(context: AssetImageQueryContext, targetPage = page.value): Promise<boolean> {
+    const keyword = context.keyword.trim();
+    const folderId = context.node?.nodeType === 'folder' ? context.node.key : undefined;
+    const ownerId = context.node?.nodeType === 'owner' ? context.node.ownerId : undefined;
+
+    if (keyword) {
+      return runFetch(
+        () =>
+          fetchAssetImageSearch({
+            keyword,
+            folderId,
+            ownerId,
+            all: context.scopeAll,
+            page: targetPage,
+            pageSize: pageSize.value
+          }),
+        targetPage
+      );
+    }
+
+    // 浏览态只有具体文件夹有直属数据，账号根节点和未选中状态直接清空列表。
+    if (!folderId) {
+      requestToken += 1;
+      items.value = [];
+      total.value = 0;
+      selectedId.value = null;
+      return true;
+    }
+
+    return runFetch(() => fetchAssetImageList({ folderId, page: targetPage, pageSize: pageSize.value }), targetPage);
+  }
+
+  /** 标记当前选中的图片。 */
+  function select(item: ApiManagement.AssetImage) {
+    selectedId.value = item.id;
   }
 
   return {
@@ -64,11 +88,6 @@ export function useAssetImageQuery() {
     total,
     selectedId,
     load,
-    changePage,
     select
   };
-
-  function select(item: ApiManagement.AssetImage) {
-    selectedId.value = item.id;
-  }
 }

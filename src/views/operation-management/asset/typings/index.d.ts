@@ -31,6 +31,16 @@ export interface AssetTreeQueryModel {
   keyword: string;
 }
 
+/** 素材图片列表查询上下文，决定使用直属浏览还是范围搜索。 */
+export interface AssetImageQueryContext {
+  /** 当前选中的文件夹树节点，未选中时为 null。 */
+  node: AssetTreeOption | null;
+  /** 是否处于全部账号查看范围。 */
+  scopeAll: boolean;
+  /** 已提交的文件名关键词，空字符串表示浏览态。 */
+  keyword: string;
+}
+
 /** 素材图片列表分页状态。 */
 export interface AssetImagePaginationState {
   /** 当前页码。 */

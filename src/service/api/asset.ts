@@ -49,6 +49,14 @@ export function fetchAssetImageList(params: ApiManagement.AssetImageListQuery) {
   });
 }
 
+/** 按选中范围搜索素材图片。 */
+export function fetchAssetImageSearch(params: ApiManagement.AssetImageSearchQuery) {
+  return request<ApiManagement.AssetImagePageResponse>({
+    url: '/asset/image/search',
+    params
+  });
+}
+
 /** 批量上传图片到指定文件夹。 */
 export function fetchAssetImageUpload(folderId: string, files: File[]) {
   const data = new FormData();

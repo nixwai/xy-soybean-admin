@@ -62,6 +62,17 @@ declare namespace ApiManagement {
   interface AssetImageListQuery extends PageQuery {
     folderId: string;
   }
+  /** 素材图片搜索参数，范围优先级为文件夹、账号、查看范围。 */
+  interface AssetImageSearchQuery extends PageQuery {
+    /** 图片原始文件名关键词。 */
+    keyword: string;
+    /** 限定为该文件夹及其全部子孙文件夹。 */
+    folderId?: string;
+    /** 限定为该账号名下全部文件夹。 */
+    ownerId?: string;
+    /** 未限定范围时是否覆盖全部账号。 */
+    all?: boolean;
+  }
   /** 素材图片分页响应。 */
   interface AssetImagePageResponse extends PageResponse<AssetImage> {}
   /** 单个上传失败项。 */

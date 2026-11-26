@@ -1,16 +1,18 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
-import { NAlert, NEmpty, NImage, NPagination, NSpin } from 'naive-ui';
+import { NAlert, NEmpty, NImage, NPagination, NSpin, NTag } from 'naive-ui';
 import { PERMISSION_CODE } from '@/constants/permission';
 import { useAuth } from '@/hooks/business/auth';
 import { formatAssetImageSize, formatAssetImageType } from '../utils/asset-image';
 import { useAssetImageQuery } from '../hooks/use-asset-image-query';
-import type { AssetTreeOption } from '../typings';
+import type { AssetTreeOption, AssetImageQueryContext } from '../typings';
 
 defineOptions({ name: 'AssetImageList' });
 
 const props = defineProps<{
   node: AssetTreeOption | null;
+  scopeAll: boolean;
+  keyword: string;
   refreshKey: number;
 }>();
 
@@ -23,12 +25,23 @@ const canRead = computed(() => hasAuth(PERMISSION_CODE.ASSET_IMAGE_READ));
 const { items, load, loading, page, pageSize, selectedId, select, total } = useAssetImageQuery();
 const loadError = ref(false);
 const selectedItem = computed(() => items.value.find(item => item.id === selectedId.value) ?? items.value[0] ?? null);
+/** 关键词非空即进入搜索态，此时结果不再局限于当前文件夹的直属图片。 */
+const isSearching = computed(() => Boolean(props.keyword.trim()));
+/** 搜索态下的范围说明，避免用户误判结果来源。 */
+const searchScopeLabel = computed(() => {
+  if (!isSearching.value) return '';
+  if (props.node?.nodeType === 'folder') return '含子文件夹';
+  if (props.node?.nodeType === 'owner') return `${props.node.label} 全部文件夹`;
+  return props.scopeAll ? '全部账号素材' : '个人素材';
+});
 
-/** 查询当前节点直属图片，并将请求失败转换为列表展示状态。 */
+/** 查询当前上下文对应的图片，并将请求失败转换为列表展示状态。 */
 async function reload(targetPage = page.value) {
   loadError.value = false;
-  const success =
-    !canRead.value || props.node?.nodeType !== 'folder' ? await load(null) : await load(props.node, targetPage);
+  const context: AssetImageQueryContext = canRead.value
+    ? { node: props.node, scopeAll: props.scopeAll, keyword: props.keyword }
+    : { node: null, scopeAll: false, keyword: '' };
+  const success = await load(context, targetPage);
   loadError.value = !success;
   return success;
 }
@@ -43,7 +56,7 @@ function handleSelect(item: ApiManagement.AssetImage) {
 }
 
 watch(
-  [() => props.node?.key, () => canRead.value, () => props.refreshKey],
+  [() => props.node?.key, () => props.scopeAll, () => props.keyword, () => canRead.value, () => props.refreshKey],
   () => {
     void reload(1);
   },
@@ -60,13 +73,18 @@ watch(
 </script>
 
 <template>
-  <NAlert v-if="loadError" type="error" class="mb-16px" title="素材加载失败">请稍后重试或重新选择文件夹。</NAlert>
+  <NAlert v-if="loadError" type="error" class="mb-16px" title="素材加载失败">请稍后重试或调整搜索条件。</NAlert>
 
   <NSpin :show="loading">
-    <div class="mb-12px flex items-center justify-between">
+    <div class="mb-12px h-8 flex items-center justify-between">
       <span class="text-12px text-#999">{{ total }} 个素材</span>
+      <NTag v-if="searchScopeLabel" size="small" :bordered="false">{{ searchScopeLabel }}</NTag>
     </div>
-    <NEmpty v-if="!items.length && !loading" description="该文件夹暂未添加素材图片" class="py-80px" />
+    <NEmpty
+      v-if="!items.length && !loading"
+      :description="isSearching ? '未找到匹配的图片' : '该文件夹暂未添加素材图片'"
+      class="py-80px"
+    />
     <div v-else class="asset-image-grid">
       <button
         v-for="item in items"

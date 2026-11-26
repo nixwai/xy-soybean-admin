@@ -1,20 +1,18 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { onUnmounted } from 'vue';
+import { useAssetContextStore } from './store';
 import AssetFolderPanel from './components/asset-folder-panel.vue';
 import AssetImagePanel from './components/asset-image-panel.vue';
-import type { AssetTreeOption } from './typings';
 
-const selectedNode = ref<AssetTreeOption | null>(null);
+const assetContext = useAssetContextStore();
 
-/** 接收文件夹面板的选中节点，为右侧素材内容提供当前上下文。 */
-function handleFolderSelect(node: AssetTreeOption | null) {
-  selectedNode.value = node;
-}
+// 页面级上下文只服务当前页面，离开时恢复默认查看范围与选中节点。
+onUnmounted(() => assetContext.reset());
 </script>
 
 <template>
   <div class="h-full min-h-520px flex gap-16px">
-    <AssetFolderPanel @select="handleFolderSelect" />
-    <AssetImagePanel :node="selectedNode" />
+    <AssetFolderPanel />
+    <AssetImagePanel />
   </div>
 </template>
