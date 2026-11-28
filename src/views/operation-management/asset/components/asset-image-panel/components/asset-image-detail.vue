@@ -1,12 +1,21 @@
 <script setup lang="ts">
-import { NEmpty, NImage } from 'naive-ui';
+import { computed } from 'vue';
+import { storeToRefs } from 'pinia';
+import { NButton, NEmpty, NImage, NSpace } from 'naive-ui';
+import type { AssetImageAction } from '@/views/operation-management/asset/typings';
 import { formatAssetImageDate, formatAssetImageSize, formatAssetImageType } from '../utils/asset-image';
+import { useAssetImageStore } from '../store/asset-image-store';
+import { useAssetImageAccess } from '../hooks/use-asset-image-access';
 
 defineOptions({ name: 'AssetImageDetail' });
 
-defineProps<{
-  item: ApiManagement.AssetImage | null;
+const emit = defineEmits<{
+  action: [action: AssetImageAction, item: ApiManagement.AssetImage];
 }>();
+
+const { selectedImage: item } = storeToRefs(useAssetImageStore());
+const { getImageActions } = useAssetImageAccess();
+const actions = computed(() => (item.value ? getImageActions(item.value) : []));
 </script>
 
 <template>
@@ -36,6 +45,18 @@ defineProps<{
           <strong>{{ formatAssetImageDate(item.createdAt) }}</strong>
         </div>
       </div>
+      <NSpace class="mt-14px" wrap>
+        <NButton
+          v-for="action in actions"
+          :key="action.key"
+          size="small"
+          :type="action.key === 'delete' ? 'error' : 'default'"
+          :ghost="action.key === 'delete'"
+          @click="emit('action', action.key, item)"
+        >
+          {{ action.label }}
+        </NButton>
+      </NSpace>
     </template>
     <NEmpty v-else description="暂无素材详情" class="py-80px" />
   </aside>

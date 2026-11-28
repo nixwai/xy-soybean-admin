@@ -1,7 +1,11 @@
 import { computed, ref } from 'vue';
 import { fetchAssetFolderCreate, fetchAssetFolderUpdate } from '@/service/api';
+import type {
+  AssetFolderFormMode,
+  AssetFolderFormModel,
+  AssetTreeOption
+} from '@/views/operation-management/asset/typings';
 import { ASSET_FOLDER_OWNER_ID_PATTERN, createAssetFolderForm } from '../config/constants';
-import type { AssetFolderFormMode, AssetFolderFormModel, AssetTreeOption } from '../typings';
 
 interface AssetFolderFormSubmitOptions {
   /** 提交成功后的刷新回调。 */

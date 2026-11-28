@@ -50,3 +50,12 @@ export interface AssetImagePaginationState {
   /** 总数量。 */
   total: number;
 }
+
+/** 图片列表与详情共用的操作键。 */
+export type AssetImageAction = 'rename' | 'move' | 'copy' | 'delete';
+
+/** 可显示在操作按钮或右键菜单中的选项。 */
+export type AssetImageActionOption = {
+  key: AssetImageAction;
+  label: string;
+};

@@ -4,7 +4,7 @@ import type { DropdownOption, TreeOption } from 'naive-ui';
 import { PERMISSION_CODE } from '@/constants/permission';
 import { useAuthStore } from '@/store/modules/auth';
 import { useAuth } from '@/hooks/business/auth';
-import type { AssetTreeOption } from '../typings';
+import type { AssetTreeOption } from '@/views/operation-management/asset/typings';
 
 /** 管理素材文件夹树的右键目标、菜单选项和关闭行为。 */
 export function useAssetFolderContextMenu() {

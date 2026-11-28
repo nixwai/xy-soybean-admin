@@ -3,7 +3,7 @@ import {
   buildAssetTree,
   buildPersonalAssetTree,
   findAssetTreeNode
-} from '@/views/operation-management/asset/utils/asset-tree';
+} from '@/views/operation-management/asset/components/asset-folder-panel/utils/asset-tree';
 
 function folder(id: string, name: string, children: ApiManagement.AssetFolderTreeNode[] = []) {
   const account = { id: '1', username: '账号A' };

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { NForm, NFormItem, NInput } from 'naive-ui';
-import type { AssetTreeQueryModel } from '../typings';
+import type { AssetTreeQueryModel } from '@/views/operation-management/asset/typings';
 
 defineOptions({ name: 'AssetSearchForm' });
 

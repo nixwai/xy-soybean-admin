@@ -1,4 +1,4 @@
-import type { AssetFolderFormModel } from '../typings';
+import type { AssetFolderFormModel } from '@/views/operation-management/asset/typings';
 
 /** 文件夹名称长度上限，与后端字段长度一致。 */
 export const ASSET_FOLDER_NAME_MAX_LENGTH = 128;

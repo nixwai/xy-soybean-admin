@@ -4,6 +4,8 @@ import { PERMISSION_CODE } from '@/constants/permission';
 import { fetchAssetFolderTreeAll, fetchAssetFolderTree } from '@/service/api';
 import { useAuthStore } from '@/store/modules/auth';
 import { useAuth } from '@/hooks/business/auth';
+import { useAssetContextStore } from '@/views/operation-management/asset/store';
+import type { AssetTreeQueryModel } from '@/views/operation-management/asset/typings';
 import {
   buildAssetTree,
   buildPersonalAssetTree,
@@ -11,8 +13,6 @@ import {
   filterAssetTree,
   findAssetTreeNode
 } from '../utils/asset-tree';
-import { useAssetContextStore } from '../store';
-import type { AssetTreeQueryModel } from '../typings';
 
 /** 管理素材文件夹树的数据源、节点选中，并把查看范围与选中结果同步到页面共享上下文。 */
 export function useAssetFolderTree() {

@@ -1,13 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { useAssetImageQuery } from '@/views/operation-management/asset/hooks/use-asset-image-query';
-import { useAssetImageUpload } from '@/views/operation-management/asset/hooks/use-asset-image-upload';
-import type { AssetTreeOption } from '@/views/operation-management/asset/typings';
+import { useAssetImageQuery } from '@/views/operation-management/asset/components/asset-image-panel/hooks/use-asset-image-query';
+import { useAssetImageUpload } from '@/views/operation-management/asset/components/asset-image-panel/hooks/use-asset-image-upload';
 import {
   filterAssetImageFiles,
   formatAssetImageDate,
   formatAssetImageSize,
   formatAssetImageType
-} from '@/views/operation-management/asset/utils/asset-image';
+} from '@/views/operation-management/asset/components/asset-image-panel/utils/asset-image';
+import type { AssetTreeOption } from '@/views/operation-management/asset/typings';
 
 const { fetchAssetImageList, fetchAssetImageSearch, fetchAssetImageUpload } = vi.hoisted(() => ({
   fetchAssetImageList: vi.fn(),

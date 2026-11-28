@@ -16,7 +16,7 @@ vi.mock('@/store/modules/auth', () => ({
 }));
 
 import { PERMISSION_CODE } from '@/constants/permission';
-import { useAssetFolderTree } from '@/views/operation-management/asset/hooks/use-asset-folder-tree';
+import { useAssetFolderTree } from '@/views/operation-management/asset/components/asset-folder-panel/hooks/use-asset-folder-tree';
 import { useAssetContextStore } from '@/views/operation-management/asset/store';
 
 /** 构造按账号分组的文件夹树响应。 */

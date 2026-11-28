@@ -1,47 +1,51 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
-import { NAlert, NEmpty, NImage, NPagination, NSpin, NTag } from 'naive-ui';
-import { PERMISSION_CODE } from '@/constants/permission';
-import { useAuth } from '@/hooks/business/auth';
+import { computed, onUnmounted, ref, watch } from 'vue';
+import { storeToRefs } from 'pinia';
+import { NAlert, NDropdown, NEmpty, NImage, NPagination, NSpin, NTag } from 'naive-ui';
+import { useAssetContextStore } from '@/views/operation-management/asset/store';
+import type { AssetImageAction, AssetImageQueryContext } from '@/views/operation-management/asset/typings';
 import { formatAssetImageSize, formatAssetImageType } from '../utils/asset-image';
-import { useAssetImageQuery } from '../hooks/use-asset-image-query';
-import type { AssetTreeOption, AssetImageQueryContext } from '../typings';
+import { useAssetImageStore } from '../store/asset-image-store';
+import { useAssetImageAccess } from '../hooks/use-asset-image-access';
+import { useAssetImageContextMenu } from '../hooks/use-asset-image-context-menu';
 
 defineOptions({ name: 'AssetImageList' });
 
-const props = defineProps<{
-  node: AssetTreeOption | null;
-  scopeAll: boolean;
-  keyword: string;
-  refreshKey: number;
-}>();
-
 const emit = defineEmits<{
-  select: [item: ApiManagement.AssetImage | null];
+  action: [action: AssetImageAction, item: ApiManagement.AssetImage];
 }>();
 
-const { hasAuth } = useAuth();
-const canRead = computed(() => hasAuth(PERMISSION_CODE.ASSET_IMAGE_READ));
-const { items, load, loading, page, pageSize, selectedId, select, total } = useAssetImageQuery();
+const { selectedNode, scopeAll } = storeToRefs(useAssetContextStore());
+const imageStore = useAssetImageStore();
+const { items, keyword, loading, page, pageSize, refreshKey, selectedImage, total } = storeToRefs(imageStore);
+const { canRead, getImageActions } = useAssetImageAccess();
 const loadError = ref(false);
-const selectedItem = computed(() => items.value.find(item => item.id === selectedId.value) ?? items.value[0] ?? null);
+const {
+  target: menuTarget,
+  position: menuPosition,
+  options: menuOptions,
+  open: openMenu,
+  close: closeMenu,
+  takeAction
+} = useAssetImageContextMenu(getImageActions);
 /** 关键词非空即进入搜索态，此时结果不再局限于当前文件夹的直属图片。 */
-const isSearching = computed(() => Boolean(props.keyword.trim()));
+const isSearching = computed(() => Boolean(keyword.value));
 /** 搜索态下的范围说明，避免用户误判结果来源。 */
 const searchScopeLabel = computed(() => {
   if (!isSearching.value) return '';
-  if (props.node?.nodeType === 'folder') return '含子文件夹';
-  if (props.node?.nodeType === 'owner') return `${props.node.label} 全部文件夹`;
-  return props.scopeAll ? '全部账号素材' : '个人素材';
+  if (selectedNode.value?.nodeType === 'folder') return '含子文件夹';
+  if (selectedNode.value?.nodeType === 'owner') return `${selectedNode.value.label} 全部文件夹`;
+  return scopeAll.value ? '全部账号素材' : '个人素材';
 });
 
 /** 查询当前上下文对应的图片，并将请求失败转换为列表展示状态。 */
 async function reload(targetPage = page.value) {
+  closeMenu();
   loadError.value = false;
   const context: AssetImageQueryContext = canRead.value
-    ? { node: props.node, scopeAll: props.scopeAll, keyword: props.keyword }
+    ? { node: selectedNode.value, scopeAll: scopeAll.value, keyword: keyword.value }
     : { node: null, scopeAll: false, keyword: '' };
-  const success = await load(context, targetPage);
+  const success = await imageStore.load(context, targetPage);
   loadError.value = !success;
   return success;
 }
@@ -52,24 +56,38 @@ async function handlePageChange(value: number) {
 }
 
 function handleSelect(item: ApiManagement.AssetImage) {
-  select(item);
+  closeMenu();
+  imageStore.select(item);
+}
+
+/** 键盘打开时将菜单定位在卡片下方。 */
+function handleOpenMenu(event: MouseEvent | KeyboardEvent, item: ApiManagement.AssetImage) {
+  if (loading.value || !canRead.value) return;
+  if (!(event.currentTarget instanceof HTMLButtonElement)) return;
+  const card = event.currentTarget;
+  if (event instanceof MouseEvent && (event.clientX || event.clientY)) {
+    card.focus({ preventScroll: true });
+    openMenu(item, { x: event.clientX, y: event.clientY });
+  } else {
+    const { left, bottom } = card.getBoundingClientRect();
+    openMenu(item, { x: left, y: bottom });
+  }
+}
+
+function handleMenuSelect(key: string | number) {
+  const choice = takeAction(key);
+  if (choice) emit('action', choice.action, choice.item);
 }
 
 watch(
-  [() => props.node?.key, () => props.scopeAll, () => props.keyword, () => canRead.value, () => props.refreshKey],
+  [() => selectedNode.value?.key, scopeAll, keyword, canRead, refreshKey],
   () => {
     void reload(1);
   },
   { immediate: true }
 );
 
-watch(
-  selectedItem,
-  item => {
-    emit('select', item);
-  },
-  { immediate: true }
-);
+onUnmounted(imageStore.clearQuery);
 </script>
 
 <template>
@@ -92,13 +110,25 @@ watch(
         type="button"
         class="asset-image-item"
         :class="{
-          'asset-image-item--selected': selectedItem?.id === item.id
+          'asset-image-item--selected': selectedImage?.id === item.id
         }"
         :aria-label="`查看 ${item.originalName}`"
+        aria-haspopup="menu"
+        :aria-expanded="menuTarget?.id === item.id"
         @click="handleSelect(item)"
+        @contextmenu.prevent="handleOpenMenu($event, item)"
+        @keydown.shift.f10.prevent="handleOpenMenu($event, item)"
+        @keydown.context-menu.prevent="handleOpenMenu($event, item)"
       >
         <div class="asset-image-item__thumb">
-          <NImage :src="item.url" :alt="item.originalName" object-fit="contain" width="100%" height="100%" />
+          <NImage
+            :src="item.url"
+            :alt="item.originalName"
+            :preview-disabled="true"
+            object-fit="contain"
+            width="100%"
+            height="100%"
+          />
         </div>
         <div class="asset-image-item__body">
           <div class="truncate text-13px font-600">
@@ -121,6 +151,17 @@ watch(
       />
     </div>
   </NSpin>
+  <NDropdown
+    trigger="manual"
+    placement="bottom-start"
+    :show="Boolean(menuTarget)"
+    :x="menuPosition.x"
+    :y="menuPosition.y"
+    :options="menuOptions"
+    @select="handleMenuSelect"
+    @clickoutside="closeMenu"
+    @update:show="visible => !visible && closeMenu()"
+  />
 </template>
 
 <style scoped>

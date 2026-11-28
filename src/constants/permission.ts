@@ -19,7 +19,13 @@ export const PERMISSION_CODE = {
   /** 查看素材图片。 */
   ASSET_IMAGE_READ: 'asset.image.read',
   /** 上传素材图片。 */
-  ASSET_IMAGE_UPLOAD: 'asset.image.upload'
+  ASSET_IMAGE_UPLOAD: 'asset.image.upload',
+  /** 重命名素材图片。 */
+  ASSET_IMAGE_UPDATE: 'asset.image.update',
+  /** 删除素材图片。 */
+  ASSET_IMAGE_DELETE: 'asset.image.delete',
+  /** 移动素材图片。 */
+  ASSET_IMAGE_MOVE: 'asset.image.move'
 } as const;
 
 /** 后端动态权限编码。 */

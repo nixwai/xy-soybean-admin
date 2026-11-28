@@ -1,4 +1,4 @@
-import type { AssetTreeOption, AssetTreeQueryModel } from '../typings';
+import type { AssetTreeOption, AssetTreeQueryModel } from '@/views/operation-management/asset/typings';
 
 /** 账号根节点标识前缀，避免与文件夹主键冲突。 */
 const OWNER_KEY_PREFIX = 'owner:';

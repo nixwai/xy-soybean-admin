@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import { NButton, NCard, NDropdown, NEmpty, NSpace, NSpin, NSwitch, NTree } from 'naive-ui';
-import { useAssetFolderContextMenu } from '../hooks/use-asset-folder-context-menu';
-import { useAssetFolderTree } from '../hooks/use-asset-folder-tree';
-import AssetSearchForm from './asset-search-form.vue';
-import FolderDeleteModal from './folder-delete-modal.vue';
-import FolderFormModal from './folder-form-modal.vue';
+import { useAssetFolderContextMenu } from './hooks/use-asset-folder-context-menu';
+import { useAssetFolderTree } from './hooks/use-asset-folder-tree';
+import AssetFolderSearch from './components/asset-folder-search.vue';
+import FolderDeleteModal from './components/folder-delete-modal.vue';
+import FolderFormModal from './components/folder-form-modal.vue';
 
 defineOptions({
   name: 'AssetFolderPanel'
@@ -79,7 +79,7 @@ onMounted(() => void loadTree());
       </NSpace>
     </template>
     <NSpin :show="loading">
-      <AssetSearchForm v-model:query="query" style="margin-bottom: 10px" />
+      <AssetFolderSearch v-model:query="query" style="margin-bottom: 10px" />
       <NTree
         v-if="treeData.length"
         v-model:selected-keys="selectedKeys"

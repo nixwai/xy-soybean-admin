@@ -73,6 +73,20 @@ declare namespace ApiManagement {
     /** 未限定范围时是否覆盖全部账号。 */
     all?: boolean;
   }
+  /** 重命名素材图片请求。 */
+  interface AssetImageUpdateRequest {
+    id: string;
+    originalName: string;
+  }
+  /** 删除素材图片请求。 */
+  interface AssetImageSoftDeleteRequest {
+    id: string;
+  }
+  /** 移动素材图片请求。 */
+  interface AssetImageMoveRequest {
+    id: string;
+    folderId: string;
+  }
   /** 素材图片分页响应。 */
   interface AssetImagePageResponse extends PageResponse<AssetImage> {}
   /** 单个上传失败项。 */

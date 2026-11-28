@@ -57,6 +57,33 @@ export function fetchAssetImageSearch(params: ApiManagement.AssetImageSearchQuer
   });
 }
 
+/** 重命名素材图片。 */
+export function fetchAssetImageUpdate(data: ApiManagement.AssetImageUpdateRequest) {
+  return request<ApiManagement.AssetImage>({
+    url: '/asset/image/update',
+    method: 'post',
+    data
+  });
+}
+
+/** 软删除素材图片。 */
+export function fetchAssetImageSoftDelete(data: ApiManagement.AssetImageSoftDeleteRequest) {
+  return request<null>({
+    url: '/asset/image/soft-delete',
+    method: 'post',
+    data
+  });
+}
+
+/** 移动素材图片到其他文件夹。 */
+export function fetchAssetImageMove(data: ApiManagement.AssetImageMoveRequest) {
+  return request<ApiManagement.AssetImage>({
+    url: '/asset/image/move',
+    method: 'post',
+    data
+  });
+}
+
 /** 批量上传图片到指定文件夹。 */
 export function fetchAssetImageUpload(folderId: string, files: File[]) {
   const data = new FormData();

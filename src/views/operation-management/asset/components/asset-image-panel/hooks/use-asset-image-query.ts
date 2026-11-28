@@ -1,6 +1,6 @@
 import { ref } from 'vue';
 import { fetchAssetImageList, fetchAssetImageSearch } from '@/service/api';
-import type { AssetImageQueryContext } from '../typings';
+import type { AssetImageQueryContext } from '@/views/operation-management/asset/typings';
 
 /** 图片列表查询请求。 */
 type AssetImageRequest = () => Promise<{ data: ApiManagement.AssetImagePageResponse | null }>;
@@ -42,6 +42,16 @@ export function useAssetImageQuery() {
     }
   }
 
+  /** 清空查询结果，并让尚未返回的旧请求失效。 */
+  function clear() {
+    requestToken += 1;
+    items.value = [];
+    loading.value = false;
+    page.value = 1;
+    total.value = 0;
+    selectedId.value = null;
+  }
+
   /** 按查询上下文读取图片：关键词非空走范围搜索，否则只读取当前文件夹直属图片。 */
   async function load(context: AssetImageQueryContext, targetPage = page.value): Promise<boolean> {
     const keyword = context.keyword.trim();
@@ -65,10 +75,7 @@ export function useAssetImageQuery() {
 
     // 浏览态只有具体文件夹有直属数据，账号根节点和未选中状态直接清空列表。
     if (!folderId) {
-      requestToken += 1;
-      items.value = [];
-      total.value = 0;
-      selectedId.value = null;
+      clear();
       return true;
     }
 
@@ -88,6 +95,7 @@ export function useAssetImageQuery() {
     total,
     selectedId,
     load,
+    clear,
     select
   };
 }

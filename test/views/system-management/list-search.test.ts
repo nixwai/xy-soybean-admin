@@ -31,8 +31,8 @@ vi.mock('@/service/api', () => ({
   fetchUserList: mocks.fetchUserList
 }));
 
-import { useAssetFolderTree } from '@/views/operation-management/asset/hooks/use-asset-folder-tree';
-import { filterAssetTree } from '@/views/operation-management/asset/utils/asset-tree';
+import { useAssetFolderTree } from '@/views/operation-management/asset/components/asset-folder-panel/hooks/use-asset-folder-tree';
+import { filterAssetTree } from '@/views/operation-management/asset/components/asset-folder-panel/utils/asset-tree';
 import {
   ADMIN_STATUS_OPTIONS,
   ADMIN_TYPE_OPTIONS,

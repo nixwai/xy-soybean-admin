@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { onUnmounted } from 'vue';
 import { useAssetContextStore } from './store';
-import AssetFolderPanel from './components/asset-folder-panel.vue';
-import AssetImagePanel from './components/asset-image-panel.vue';
+import AssetFolderPanel from './components/asset-folder-panel/asset-folder-panel.vue';
+import AssetImagePanel from './components/asset-image-panel/asset-image-panel.vue';
 
 const assetContext = useAssetContextStore();
 

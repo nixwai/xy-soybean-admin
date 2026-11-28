@@ -1,6 +1,6 @@
 import { ref } from 'vue';
 import { fetchAssetFolderSoftDelete } from '@/service/api';
-import type { AssetTreeOption } from '../typings';
+import type { AssetTreeOption } from '@/views/operation-management/asset/typings';
 
 interface AssetFolderDeleteOptions {
   /** 删除成功后的刷新回调。 */
